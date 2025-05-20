@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MINIXVERSE Login & Signup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* General Styles */
+    :root {
+      --primary: #4F6AFF;
+      --secondary: #8B5CF6;
+      --text-color: #f0f8ff;
+      --card-bg: rgba(20, 25, 40, 0.5);
+      --tab-border: #4F6AFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: transparent; /* Background is handled by galaxy */
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden; /* Prevents scrollbars from galaxy/stars */
+    }
+
+    /* Loading Overlay Styles */
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.8), 0 0 20px rgba(139, 92, 246, 0.5);
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+      position: relative;
+      animation: pulse 2s infinite;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      border-right: 4px solid var(--secondary);
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+
+    .loading-text {
+      color: var(--text-color);
+      font-size: 16px;
+      margin-top: 20px;
+      opacity: 0.8;
+      animation: fadeInOut 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .logo::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120%;
+      height: 120%;
+      background: radial-gradient(circle, rgba(79, 106, 255, 0.3) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+      z-index: -1;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+      100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Galaxy Background Styles */
+    .galaxy-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+      overflow: hidden;
+      z-index: -2; /* Behind everything */
+    }
+
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.2;
+      animation: nebulaFloat 60s infinite linear;
+    }
+
+    .nebula-1 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(111, 66, 193, 0.3) 0%, rgba(61, 26, 121, 0.1) 70%, transparent 100%);
+      top: 20%; left: 10%; animation-duration: 100s;
+    }
+    .nebula-2 {
+      width: 500px; height: 300px;
+      background: radial-gradient(circle, rgba(79, 106, 255, 0.3) 0%, rgba(38, 61, 174, 0.1) 70%, transparent 100%);
+      top: 60%; left: 60%; animation-duration: 120s; animation-delay: -20s;
+    }
+    .nebula-3 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(193, 66, 139, 0.2) 0%, rgba(121, 26, 84, 0.1) 70%, transparent 100%);
+      top: 30%; left: 70%; animation-duration: 110s; animation-delay: -50s;
+    }
+    .nebula-4 {
+      width: 600px; height: 400px;
+      background: radial-gradient(circle, rgba(66, 193, 152, 0.2) 0%, rgba(26, 121, 96, 0.05) 70%, transparent 100%);
+      top: 70%; left: 20%; animation-duration: 130s; animation-delay: -80s;
+    }
+
+    @keyframes nebulaFloat {
+      0% { transform: rotate(0deg) translate(20px) rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) translate(30px) rotate(-180deg) scale(1.2); }
+      100% { transform: rotate(360deg) translate(20px) rotate(-360deg) scale(1); }
+    }
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Behind content, above galaxy */
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: twinkle var(--twinkle-duration, 4s) ease-in-out var(--twinkle-delay, 0s) infinite,
+                 drift var(--drift-duration, 80s) ease-in-out var(--drift-delay, 0s) infinite;
+    }
+    .star.tiny { width: 1px; height: 1px; opacity: 0.5; }
+    .star.small { width: 2px; height: 2px; opacity: 0.6; }
+    .star.medium { width: 3px; height: 3px; opacity: 0.8; }
+    .star.large { width: 4px; height: 4px; opacity: 0.9; box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4); }
+    .star.bright { opacity: 1; box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.7); }
+
+    @keyframes twinkle {
+      0% { opacity: 0.2; filter: brightness(0.5); }
+      50% { opacity: 1; filter: brightness(1.2); }
+      100% { opacity: 0.2; filter: brightness(0.5); }
+    }
+    @keyframes drift {
+      0% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(var(--drift-x, 10px)) translateY(var(--drift-y, 10px)); }
+      50% { transform: translateX(var(--drift-x2, 5px)) translateY(var(--drift-y2, -10px)); }
+      75% { transform: translateX(var(--drift-x3, -10px)) translateY(var(--drift-y3, 5px)); }
+      100% { transform: translateX(0) translateY(0); }
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 2px; height: 2px; border-radius: 50%;
+      background-color: #fff;
+      box-shadow: 0 0 5px 1px white, 0 0 10px 2px rgba(255, 255, 255, 0.8);
+      opacity: 1; filter: blur(0.5px);
+      animation: shooting var(--shooting-duration, 3s) ease-out var(--shooting-delay, 0s) infinite;
+    }
+    @keyframes shooting {
+      0% { opacity: 0; transform: translate(var(--shooting-start-x, 0), var(--shooting-start-y, 0)) scale(0.5) rotate(var(--shooting-angle, 0deg)); }
+      5% { opacity: 1; transform: translate(var(--shooting-start-x, 0), var(--shooting-start-y, 0)) scale(1) rotate(var(--shooting-angle, 0deg)); }
+      100% { opacity: 0; transform: translate(var(--shooting-end-x, 500px), var(--shooting-end-y, 500px)) scale(0.2) rotate(var(--shooting-angle, 0deg)); }
+    }
+
+    /* Form Styles */
+    .form-wrapper {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(79, 106, 255, 0.2);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid rgba(79, 106, 255, 0.3);
+      position: relative; /* For stacking context */
+      z-index: 10; /* Above background elements */
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      padding: 8px 15px;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+      z-index: 100; /* Above other elements */
+    }
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+      background: rgba(79, 106, 255, 0.2);
+    }
+
+    .tab-group {
+      display: flex;
+      border-bottom: 2px solid rgba(226, 232, 240, 0.2);
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .tab:hover { background: rgba(255, 255, 255, 0.05); }
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--tab-border);
+    }
+
+    .form-panel {
+      display: none;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    .form-panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group { margin-bottom: 20px; }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      background: rgba(20, 30, 50, 0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 5px;
+      font-size: 14px;
+      color: #e6e6e6;
+      transition: all 0.3s;
+    }
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 106, 255, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 10px rgba(50, 50, 93, 0.2);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(50, 50, 93, 0.4);
+    }
+
+    .footer-text {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #a0aec0;
+    }
+    .footer-text a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 12px; font-weight: bold;
+      padding: 5px;
+    }
+    .toggle-password:hover { color: var(--secondary); }
+
+    /* Validation and Shake Animation */
+    .validation-message {
+      display: block;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .validation-error { color: #ff6b6b; }
+    .validation-success { color: #4cd964; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* OTP Modal Styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(10, 15, 30, 0.8); /* Semi-transparent dark background */
+      z-index: 1000; /* Above other content */
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(79, 106, 255, 0.3);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid rgba(79, 106, 255, 0.3);
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    .otp-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .otp-input {
+      width: 50px; height: 60px;
+      font-size: 24px; text-align: center;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(20, 30, 50, 0.7);
+      color: white;
+    }
+    .otp-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 106, 255, 0.3);
+    }
+    .otp-info { margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.7); }
+    .resend-btn {
+      background: transparent; border: none;
+      color: var(--primary); text-decoration: underline;
+      cursor: pointer; margin-top: 10px; font-size: 14px;
+    }
+    .resend-btn:hover { color: var(--secondary); }
+    .timer { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 5px; }
+
+    /* Verification Process Loading Styles */
+    .verification-process {
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .circular-progress {
+      position: relative;
+      width: 120px; height: 120px;
+      margin: 20px 0;
+    }
+    .circular-progress-circle {
+      transform: rotate(-90deg);
+      transform-origin: center;
+      width: 100%; height: 100%;
+    }
+    .circular-progress-circle circle {
+      stroke-dasharray: 283; /* Circumference of circle with r=45 */
+      stroke-dashoffset: 283;
+      stroke-linecap: round;
+      stroke-width: 4;
+      fill: transparent;
+    }
+    .progress-background { stroke: rgba(255, 255, 255, 0.1); }
+    .progress-value { stroke: var(--primary); animation: progress 5s linear forwards; }
+    @keyframes progress {
+      0% { stroke-dashoffset: 283; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .progress-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px; font-weight: bold; color: white;
+    }
+    .progress-label { margin-top: 10px; font-size: 16px; color: rgba(255,255,255,0.8); }
+
+    /* Email OTP Popup Styles */
+    .email-popup {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%; max-width: 500px;
+      background: #fff; /* Solid background for email look */
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      z-index: 2000; /* Above OTP modal */
+      overflow: hidden;
+    }
+    .email-header {
+      background: #1a73e8; /* Gmail-like blue */
+      color: white;
+      padding: 15px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .email-header h3 { margin: 0; font-family: Arial, sans-serif; font-size: 16px; }
+    .email-body { padding: 20px; color: #333; font-family: Arial, sans-serif; }
+    .email-content {
+      background: #f5f5f5; /* Light grey background for content area */
+      border-radius: 5px;
+      padding: 20px; margin: 10px 0;
+    }
+    .otp-display {
+      font-size: 28px; font-weight: bold; letter-spacing: 5px;
+      text-align: center; color: #1a73e8;
+      margin: 15px 0; padding: 10px;
+      background: rgba(26, 115, 232, 0.1);
+      border-radius: 5px;
+    }
+    .email-footer {
+      border-top: 1px solid #eee;
+      padding: 15px 20px;
+      font-size: 12px; color: #777;
+    }
+    .close-email-btn {
+      background: #f0f0f0; border: none;
+      padding: 8px 15px; border-radius: 5px;
+      cursor: pointer; font-weight: bold; color: #333;
+    }
+    .view-email-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 12px; border-radius: 5px;
+      color: rgba(255,255,255,0.9);
+      cursor: pointer; font-size: 14px;
+      margin-top: 10px; transition: all 0.2s;
+    }
+    .view-email-btn:hover { background: rgba(255,255,255,0.1); }
+
+    /* Syncing Animation Styles */
+    .sync-animation {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); /* Darker overlay */
+      z-index: 2001; /* Above email popup if needed, or manage display flow */
+      justify-content: center; align-items: center; flex-direction: column;
+    }
+    .sync-container { text-align: center; position: relative; width: 300px; height: 200px; }
+    .service-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .service-icon img { width: 50px; height: 50px; object-fit: contain; }
+    .gmail-icon { left: 20px; top: 60px; z-index: 10; }
+    .minix-icon { right: 20px; top: 60px; z-index: 10; }
+    .sync-progress {
+      position: absolute;
+      width: 200px; height: 4px;
+      background: rgba(255,255,255,0.1);
+      left: 50%; top: 100px;
+      transform: translateX(-50%);
+      border-radius: 2px; overflow: hidden;
+    }
+    .sync-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #4F6AFF, #8B5CF6);
+      transition: width 0.3s ease;
+    }
+    .sync-text {
+      position: absolute;
+      bottom: 20px; left: 0; right: 0;
+      text-align: center; color: #fff; font-size: 16px;
+    }
+    .connection-line {
+      position: absolute;
+      top: 100px; left: 60px;
+      width: 180px; height: 2px;
+      background: rgba(255,255,255,0.2);
+      z-index: 5;
+    }
+    .data-particle {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%; background: #4F6AFF;
+      top: 98px; left: 60px;
+      z-index: 6; box-shadow: 0 0 10px #4F6AFF;
+      opacity: 0;
+    }
+    @keyframes moveParticle {
+      0% { left: 60px; opacity: 1; }
+      100% { left: 240px; opacity: 0; }
+    }
+    .gmail-logo-modern { position: relative; width: 40px; height: 30px; }
+    .gmail-envelope { position: relative; width: 100%; height: 100%; }
+    .gmail-envelope-base { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background-color: #d9d9d9; border: 1px solid #ccc; border-radius: 3px; }
+    .gmail-envelope-top { position: absolute; top: 0; left: 0; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #EA4335; transform-origin: top center; }
+    .gmail-envelope-left { position: absolute; top: 0; left: 0; width: 0; height: 0; border-bottom: 15px solid #FBBC05; border-left: 20px solid transparent; border-right: 20px solid transparent; transform-origin: bottom left;}
+    .gmail-envelope-right { position: absolute; top: 0; right: 0; width: 0; height: 0; border-bottom: 15px solid #34A853; border-left: 20px solid transparent; border-right: 20px solid transparent; transform-origin: bottom right;}
+    .gmail-envelope-middle { position: absolute; top: 15px; left: 0; width: 100%; height: 15px; background-color: #4285F4; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; }
+    .gmail-envelope-top, .gmail-envelope-left, .gmail-envelope-right, .gmail-envelope-middle { box-sizing: border-box; }
+
+    /* Success Animation Styles */
+    .success-checkmark { display: none; width: 80px; height: 80px; margin: 20px 0; }
+    .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #4cd964; }
+    .check-icon::before { top: 3px; left: -2px; width: 30px; transform-origin: 100% 50%; border-radius: 100px 0 0 100px; }
+    .check-icon::after { top: 0; left: 30px; width: 60px; transform-origin: 0 50%; border-radius: 0 100px 100px 0; animation: rotate-circle 4.25s ease-in; }
+    .check-icon::before, .check-icon::after { content: ''; height: 100px; position: absolute; background: transparent; transform: rotate(-45deg); }
+    .check-icon .icon-line { height: 5px; background-color: #4cd964; display: block; border-radius: 2px; position: absolute; z-index: 10; }
+    .check-icon .icon-line.line-tip { top: 46px; left: 14px; width: 25px; transform: rotate(45deg); animation: icon-line-tip 0.75s; }
+    .check-icon .icon-line.line-long { top: 38px; right: 8px; width: 47px; transform: rotate(-45deg); animation: icon-line-long 0.75s; }
+    .check-icon .icon-circle { top: -4px; left: -4px; z-index: 10; width: 80px; height: 80px; border-radius: 50%; position: absolute; box-sizing: content-box; border: 4px solid rgba(76, 217, 100, 0.5); }
+    .check-icon .icon-fix { top: 8px; width: 5px; left: 26px; z-index: 1; height: 85px; position: absolute; transform: rotate(-45deg); background-color: transparent; }
+    @keyframes rotate-circle { 0% { transform: rotate(-45deg); } 5% { transform: rotate(-45deg); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
+    @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 45px; } }
+    @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0px; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
+
+    /* Terms & Conditions Modal Styles */
+    #disclaimerModal {
+        display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.7); z-index:1000;
+        justify-content:center; align-items:center;
+    }
+    #disclaimerModal > div { /* Direct child div for content */
+        background:#1a1a2e; color:#fff; padding:20px; border-radius:8px;
+        max-width:500px; max-height:80vh; text-align:left;
+        position:relative; margin: 20px; /* Added margin for smaller screens */
+        display: flex; flex-direction: column; /* For sticky header/footer */
+    }
+    #disclaimerModal h2 {
+        margin-top:0; color: var(--primary); text-align: center;
+        position: sticky; top: 0; background: #1a1a2e; padding: 10px 0;
+        z-index: 1; /* Ensure header stays above scrolling content */
+    }
+    #disclaimerModal .modal-scroll-content {
+        overflow-y: auto;
+        /* max-height: calc(80vh - 120px); /* Adjust based on header/footer height */
+        padding-right: 10px; /* For scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary) #333;
+        flex-grow: 1; /* Allow content to take available space */
+    }
+    #disclaimerModal ol { font-size: 0.9rem; line-height: 1.6; padding-left: 25px; }
+    #disclaimerModal .modal-footer {
+        position: sticky; bottom: 0; background: #1a1a2e;
+        padding: 10px 0 0 0; text-align: center;
+        z-index: 1; /* Ensure footer stays above scrolling content */
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .form-wrapper { padding: 30px 20px; }
+      .back-button { left: 15px; top: 15px; padding: 6px 10px; font-size: 12px; }
+      .otp-input { width: 40px; height: 50px; font-size: 20px; }
+      .modal-content { padding: 20px; }
+      #disclaimerModal > div { margin: 15px; padding: 15px;}
+      #disclaimerModal h2 { font-size: 1.2rem; }
+      #disclaimerModal ol { font-size: 0.8rem; }
+    }
+
+  </style>
+</head>
+<body>
+  <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgb(10,15,30); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+    <div class="logo-container">
+      <div class="logo">MINIXVERSE</div>
+      <div class="loading-spinner"></div>
+    </div>
+    <p class="loading-text">Preparing your cosmic journey...</p>
+  </div>
+
+  <div class="galaxy-background">
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+    <div class="nebula nebula-4"></div>
+  </div>
+
+  <div class="stars"></div>
+
+  <a href="index.html" class="back-button" title="Back to Home">My Homepage</a>
+
+  <div class="form-wrapper">
+    <div class="tab-group">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <div class="form-panel active" id="login-panel">
+      <form id="login-form">
+        <div class="input-group">
+          <label for="login-email">Email Address</label>
+          <div style="position: relative;">
+            <input type="email" id="login-email" name="email" placeholder="you@example.com" required oninput="validateEmail(this)" />
+            <span id="login-email-validation-message" class="validation-message"></span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <div style="position: relative;">
+            <input type="password" id="login-password" name="password" placeholder="••••••••" required />
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('login-password', this)">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn">Login</button>
+        <div class="footer-text">Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Sign up</a></div>
+      </form>
+    </div>
+
+    <div class="form-panel" id="signup-panel">
+      <form id="signup-form">
+        <div class="input-group">
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" name="name" placeholder="Your Name" required />
+        </div>
+        <div class="input-group">
+          <label for="signup-email">Email Address</label>
+          <div style="position: relative;">
+            <input type="email" id="signup-email" name="email" placeholder="you@example.com" required oninput="validateEmail(this)" />
+            <span id="email-validation-message" class="validation-message"></span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="signup-password">Password</label>
+          <div style="position: relative;">
+            <input type="password" id="signup-password" name="password" placeholder="Create a password" required />
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signup-password', this)">Show</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="signup-referral">Referral Code (Optional)</label>
+          <input type="text" id="signup-referral" name="referral" placeholder="Enter referral code" />
+        </div>
+        <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="terms" name="terms" required style="margin: 0; width: auto;" /> <label for="terms" style="margin: 0; font-weight: normal; color: #e6e6e6; display: inline;"> I agree to the <a href="#" onclick="showDisclaimerModal(); return false;" style="color: var(--primary); text-decoration: underline;">Terms and Conditions</a>
+          </label>
+        </div>
+        <button type="submit" class="btn" id="verify-btn">Verify & Create Account</button>
+        <div class="footer-text">Already have an account? <a href="#" onclick="switchTab('login'); return false;">Login</a></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="otpModal" class="modal">
+    <div class="modal-content">
+      <div id="verification-process" class="verification-process">
+        <h2>Verifying Your Account</h2>
+        <div class="circular-progress">
+          <svg class="circular-progress-circle" viewBox="0 0 100 100">
+            <circle class="progress-background" cx="50" cy="50" r="45"></circle>
+            <circle class="progress-value" cx="50" cy="50" r="45"></circle>
+          </svg>
+          <div class="progress-text" id="progress-percentage">0%</div>
+        </div>
+        <p class="progress-label">Please wait while we prepare your verification...</p>
+      </div>
+
+      <div id="otp-input-screen" style="display: none;">
+        <h2>OTP Verification</h2>
+        <p>A 6-digit OTP has been sent to <strong id="otp-email-display">your email address</strong>.</p>
+        <div class="otp-container">
+          <input type="text" class="otp-input" maxlength="1" id="otp-1" oninput="moveToNext(this, 'otp-2')" onkeyup="handleOTPKey(event, null, 'otp-2')">
+          <input type="text" class="otp-input" maxlength="1" id="otp-2" oninput="moveToNext(this, 'otp-3')" onkeyup="handleOTPKey(event, 'otp-1', 'otp-3')">
+          <input type="text" class="otp-input" maxlength="1" id="otp-3" oninput="moveToNext(this, 'otp-4')" onkeyup="handleOTPKey(event, 'otp-2', 'otp-4')">
+          <input type="text" class="otp-input" maxlength="1" id="otp-4" oninput="moveToNext(this, 'otp-5')" onkeyup="handleOTPKey(event, 'otp-3', 'otp-5')">
+          <input type="text" class="otp-input" maxlength="1" id="otp-5" oninput="moveToNext(this, 'otp-6')" onkeyup="handleOTPKey(event, 'otp-4', 'otp-6')">
+          <input type="text" class="otp-input" maxlength="1" id="otp-6" oninput="verifyOTP()" onkeyup="handleOTPKey(event, 'otp-5', null)">
+        </div>
+        <button class="view-email-btn" onclick="showEmailOTP()">View Simulated Email OTP</button>
+        <p class="otp-info">Didn't receive the OTP?</p>
+        <button class="resend-btn" onclick="resendOTP()" disabled>Resend OTP</button>
+        <div class="timer" id="otp-timer">Resend available in <span id="countdown">30</span>s</div>
+        <button class="btn" style="margin-top: 20px;" onclick="verifyOTP()">Verify OTP</button>
+         <button class="btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px;" onclick="closeOTPModal()">Cancel</button>
+      </div>
+
+      <div id="success-screen" style="display: none;">
+        <div class="success-checkmark">
+          <div class="check-icon">
+            <span class="icon-line line-tip"></span>
+            <span class="icon-line line-long"></span>
+            <div class="icon-circle"></div>
+            <div class="icon-fix"></div>
+          </div>
+        </div>
+        <h2>Verification Successful!</h2>
+        <p>Your account has been successfully created.</p>
+        <button class="btn" onclick="redirectToLogin()">Proceed to Login</button>
+      </div>
+
+      <div id="failure-screen" style="display: none;">
+        <h2>Verification Failed</h2>
+        <p>The OTP you entered is incorrect. Please try again.</p>
+        <button class="btn" onclick="showOTPScreen()">Try Again</button>
+        <button class="btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px;" onclick="closeOTPModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="syncAnimation" class="sync-animation">
+    <div class="sync-container">
+      <div class="connection-line"></div>
+      <div class="data-particle" id="particle1"></div>
+      <div class="data-particle" id="particle2"></div>
+      <div class="data-particle" id="particle3"></div>
+      <div class="service-icon gmail-icon">
+        <div class="gmail-logo-modern">
+          <div class="gmail-envelope">
+            <div class="gmail-envelope-base"></div>
+            <div class="gmail-envelope-top"></div>
+            <div class="gmail-envelope-left"></div>
+            <div class="gmail-envelope-right"></div>
+            <div class="gmail-envelope-middle"></div>
+          </div>
+        </div>
+      </div>
+      <div class="service-icon minix-icon">
+        <span style="font-family: 'Orbitron', sans-serif; color: #4F6AFF; font-size: 12px; font-weight: bold;">MINIX</span>
+      </div>
+      <div class="sync-progress"><div class="sync-bar" id="syncBar"></div></div>
+      <div class="sync-text" id="syncText">Connecting to Gmail...</div>
+    </div>
+  </div>
+
+  <div id="emailOTPPopup" class="email-popup">
+    <div class="email-header">
+      <h3>MINIXVERSE OTP Verification</h3>
+      <button class="close-email-btn" onclick="closeEmailOTP()">×</button>
+    </div>
+    <div class="email-body">
+      <div>
+        <strong>From:</strong> noreply@minixverse.com<br>
+        <strong>To:</strong> <span id="user-email-in-popup"></span><br>
+        <strong>Subject:</strong> Your OTP for MINIXVERSE Account Verification
+      </div>
+      <div class="email-content">
+        <p>Dear <span id="user-name-in-popup"></span>,</p>
+        <p>Your One-Time Password (OTP) for MINIXVERSE account verification is:</p>
+        <div class="otp-display" id="generated-otp-in-popup">123456</div>
+        <p>This OTP is valid for 5 minutes. Please do not share this OTP with anyone.</p>
+        <p>If you did not request this OTP, please ignore this email.</p>
+        <p>Best regards,<br>MINIXVERSE Team</p>
+      </div>
+    </div>
+    <div class="email-footer">
+      This is an automated message. Please do not reply to this email.
+    </div>
+  </div>
+
+  <div id="disclaimerModal">
+    <div>
+      <h2>Terms & Conditions</h2>
+      <div class="modal-scroll-content">
+        <ol>
+          <li>By signing up, you agree to abide by all rules, regulations, and risks associated with crypto investments, including but not limited to market volatility, loss of funds, and digital security risks.</li>
+          <li>MINIXVERSE is not responsible for any financial losses that may occur during your use of our platform.</li>
+          <li>Users must be at least 18 years of age to create an account.</li>
+          <li>You are responsible for maintaining the confidentiality of your account information.</li>
+          <li>MINIXVERSE reserves the right to suspend or terminate accounts that violate our terms of service.</li>
+          <li>Users agree not to engage in any illegal activities through our platform.</li>
+          <li>All transactions on the platform are final and cannot be reversed.</li>
+          <li>Market data displayed may be delayed and should not be relied upon for trading decisions.</li>
+          <li>MINIXVERSE may update these terms at any time without prior notice.</li>
+          <li>You acknowledge that digital assets are not insured by any government entity.</li>
+          <li>The platform may experience downtime for maintenance or due to technical issues.</li>
+          <li>Trading fees will be clearly displayed before each transaction.</li>
+          <li>Users may only create one account per person.</li>
+          <li>MINIXVERSE reserves the right to request identity verification at any time.</li>
+          <li>Any attempts to manipulate the market or engage in fraudulent activities will result in immediate account termination.</li>
+          <li>The platform uses cookies to enhance user experience.</li>
+          <li>Users agree to receive communications from MINIXVERSE regarding their account and platform updates.</li>
+          <li>Intellectual property on the platform belongs to MINIXVERSE and may not be reproduced without permission.</li>
+          <li>These terms are governed by applicable financial regulations in your jurisdiction.</li>
+          <li>By creating an account, you acknowledge that you have read, understood, and agree to all these terms.</li>
+        </ol>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeDisclaimerModal()" class="btn" style="margin-top: 10px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Global Variables ---
+    let generatedOTP = "";
+    let countdownInterval;
+    const OTP_TIMER_DURATION = 30; // seconds
+
+    // --- DOM Elements (cached for performance) ---
+    const otpModal = document.getElementById('otpModal');
+    const verificationProcessScreen = document.getElementById('verification-process');
+    const otpInputScreen = document.getElementById('otp-input-screen');
+    const successScreen = document.getElementById('success-screen');
+    const failureScreen = document.getElementById('failure-screen');
+    const progressText = document.getElementById('progress-percentage');
+    const verificationLabel = document.querySelector('#verification-process .progress-label');
+    const otpEmailDisplay = document.getElementById('otp-email-display');
+    const otpInputs = Array.from(document.querySelectorAll('.otp-input')); // For easier iteration
+    const resendOTPButton = document.querySelector('.resend-btn');
+    const otpTimerDiv = document.getElementById('otp-timer');
+    const countdownSpan = document.getElementById('countdown');
+    const syncAnimationElement = document.getElementById('syncAnimation');
+    const syncBar = document.getElementById('syncBar');
+    const syncText = document.getElementById('syncText');
+    const emailOTPPopup = document.getElementById('emailOTPPopup');
+    const userEmailInPopup = document.getElementById('user-email-in-popup');
+    const userNameInPopup = document.getElementById('user-name-in-popup');
+    const generatedOtpInPopup = document.getElementById('generated-otp-in-popup');
+    const disclaimerModal = document.getElementById('disclaimerModal');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+
+
+    // --- Utility Functions ---
+    function switchTab(tabName) {
+      const loginTab = document.querySelector('.tab-group .tab:nth-child(1)');
+      const signupTab = document.querySelector('.tab-group .tab:nth-child(2)');
+      const loginPanel = document.getElementById('login-panel');
+      const signupPanel = document.getElementById('signup-panel');
+
+      loginTab.classList.toggle('active', tabName === 'login');
+      signupTab.classList.toggle('active', tabName === 'signup');
+      loginPanel.classList.toggle('active', tabName === 'login');
+      signupPanel.classList.toggle('active', tabName === 'signup');
+
+      // Reset animation for smooth transition
+      if (tabName === 'login') {
+        loginPanel.style.animation = 'none';
+        requestAnimationFrame(() => loginPanel.style.animation = ''); // Trigger reflow
+      } else {
+        signupPanel.style.animation = 'none';
+        requestAnimationFrame(() => signupPanel.style.animation = '');
+      }
+    }
+
+    function showDisclaimerModal() {
+      disclaimerModal.style.display = 'flex';
+    }
+
+    function closeDisclaimerModal() {
+      disclaimerModal.style.display = 'none';
+    }
+
+    function validateEmail(inputElement) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // More robust email regex
+      const validationMessageElement = inputElement.id === 'signup-email' ?
+                                      document.getElementById('email-validation-message') :
+                                      document.getElementById('login-email-validation-message');
+      const inputGroup = inputElement.closest('.input-group');
+
+      if (inputElement.value.length > 0) {
+        if (emailRegex.test(inputElement.value)) {
+          validationMessageElement.textContent = "Valid email format";
+          validationMessageElement.className = "validation-message validation-success";
+          inputElement.style.borderColor = "#4cd964";
+          inputGroup.classList.remove('shake');
+        } else {
+          validationMessageElement.textContent = "Please enter a valid email (e.g., name@example.com)";
+          validationMessageElement.className = "validation-message validation-error";
+          inputElement.style.borderColor = "#ff6b6b";
+          if (inputElement.value.length > 3 && !inputElement.dataset.hasShaken) {
+            inputGroup.classList.add('shake');
+            inputElement.dataset.hasShaken = 'true'; // Prevent repeated shaking
+            setTimeout(() => {
+              inputGroup.classList.remove('shake');
+              inputElement.dataset.hasShaken = 'false'; // Reset for next invalid input
+            }, 500);
+          }
+        }
+      } else {
+        validationMessageElement.textContent = "";
+        inputElement.style.borderColor = ""; // Reset border
+        inputGroup.classList.remove('shake');
+        inputElement.dataset.hasShaken = 'false';
+      }
+    }
+
+    function togglePasswordVisibility(inputId, button) {
+      const passwordInput = document.getElementById(inputId);
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        button.textContent = 'Hide';
+      } else {
+        passwordInput.type = 'password';
+        button.textContent = 'Show';
+      }
+    }
+
+    // --- Star Generation ---
+    function generateStars() {
+      const starsContainer = document.querySelector('.stars');
+      if (!starsContainer) return;
+      starsContainer.innerHTML = ''; // Clear existing stars
+      const numberOfStars = window.innerWidth < 768 ? 100 : 200; // Fewer stars on mobile
+
+      for (let i = 0; i < numberOfStars; i++) {
+        const star = document.createElement('div');
+        const starTypes = ['tiny', 'small', 'medium', 'large'];
+        star.classList.add('star', starTypes[Math.floor(Math.random() * starTypes.length)]);
+        if (Math.random() > 0.9) star.classList.add('bright');
+
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+
+        const twinkleDuration = 2 + Math.random() * 6;
+        const twinkleDelay = Math.random() * 5;
+        star.style.setProperty('--twinkle-duration', `${twinkleDuration}s`);
+        star.style.setProperty('--twinkle-delay', `${twinkleDelay}s`);
+
+        const driftDuration = 60 + Math.random() * 120;
+        const driftDelay = Math.random() * 60;
+        const driftX = -15 + Math.random() * 30;
+        const driftY = -15 + Math.random() * 30;
+        star.style.setProperty('--drift-duration', `${driftDuration}s`);
+        star.style.setProperty('--drift-delay', `${driftDelay}s`);
+        star.style.setProperty('--drift-x', `${driftX}px`);
+        star.style.setProperty('--drift-y', `${driftY}px`);
+        // Add more drift points for variety if desired
+        star.style.setProperty('--drift-x2', `${-15 + Math.random() * 30}px`);
+        star.style.setProperty('--drift-y2', `${-15 + Math.random() * 30}px`);
+        star.style.setProperty('--drift-x3', `${-15 + Math.random() * 30}px`);
+        star.style.setProperty('--drift-y3', `${-15 + Math.random() * 30}px`);
+
+        starsContainer.appendChild(star);
+      }
+      for (let i = 0; i < 3; i++) createShootingStar(starsContainer); // Fewer shooting stars
+    }
+
+    function createShootingStar(container) {
+      const star = document.createElement('div');
+      star.classList.add('shooting-star');
+      const startLeft = Math.random() * 100;
+      const startTop = Math.random() * 100;
+      const angle = Math.random() * 360;
+      const distance = 100 + Math.random() * (window.innerWidth / 4); // Adjust distance
+      const radians = angle * (Math.PI / 180);
+      const endLeft = startLeft + Math.cos(radians) * (distance / window.innerWidth * 100); // Relative to viewport
+      const endTop = startTop + Math.sin(radians) * (distance / window.innerHeight * 100);
+
+      star.style.setProperty('--shooting-start-x', `${startLeft}%`); // Use percentages
+      star.style.setProperty('--shooting-start-y', `${startTop}%`);
+      star.style.setProperty('--shooting-end-x', `${endLeft}%`);
+      star.style.setProperty('--shooting-end-y', `${endTop}%`);
+      star.style.setProperty('--shooting-angle', `${angle}deg`);
+
+      const duration = 2 + Math.random() * 3;
+      const delay = 5 + Math.random() * 10;
+      star.style.setProperty('--shooting-duration', `${duration}s`);
+      star.style.setProperty('--shooting-delay', `${delay}s`);
+
+      star.style.left = `${startLeft}%`;
+      star.style.top = `${startTop}%`;
+      container.appendChild(star);
+
+      setTimeout(() => {
+        if (star.parentNode) star.remove();
+        createShootingStar(container); // Recreate
+      }, (duration + delay) * 1000);
+    }
+
+
+    // --- OTP Modal & Verification Flow ---
+    function showOTPModal() {
+      otpModal.style.display = 'flex';
+      verificationProcessScreen.style.display = 'flex';
+      otpInputScreen.style.display = 'none';
+      successScreen.style.display = 'none';
+      failureScreen.style.display = 'none';
+      otpEmailDisplay.textContent = document.getElementById('signup-email').value;
+      simulateVerificationProcess();
+    }
+
+    function simulateVerificationProcess() {
+      verificationLabel.textContent = 'Please wait while we prepare your verification...';
+      progressText.textContent = '0%';
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 1;
+        progressText.textContent = `${progress}%`;
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+          setTimeout(() => {
+            verificationProcessScreen.style.display = 'none';
+            otpInputScreen.style.display = 'block';
+            otpInputs[0].focus();
+            generateAndDisplayOTP();
+            startCountdown();
+          }, 500);
+        }
+      }, 50); // 50ms * 100 = 5 seconds
+    }
+
+    function generateAndDisplayOTP() {
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      // For simulated email popup
+      userNameInPopup.textContent = document.getElementById('signup-name').value || "User";
+      userEmailInPopup.textContent = document.getElementById('signup-email').value;
+      generatedOtpInPopup.textContent = generatedOTP;
+      console.log("Generated OTP (for testing):", generatedOTP); // For testing
+    }
+
+    function showEmailOTP() {
+      syncAnimationElement.style.display = 'flex';
+      resetSyncAnimation();
+      startSyncAnimation();
+      setTimeout(() => {
+        syncAnimationElement.style.display = 'none';
+        emailOTPPopup.style.display = 'block';
+      }, 5000); // Sync animation duration
+    }
+
+    function closeEmailOTP() {
+      emailOTPPopup.style.display = 'none';
+    }
+
+    function resetSyncAnimation() {
+      syncBar.style.width = '0%';
+      syncText.textContent = 'Connecting to Gmail...';
+      document.querySelectorAll('.data-particle').forEach(p => {
+        p.style.animation = 'none';
+        p.offsetHeight; // Trigger reflow
+        p.style.animation = null;
+        p.style.opacity = '0';
+      });
+      document.querySelector('.gmail-icon').style.transform = 'scale(1)';
+      document.querySelector('.minix-icon').style.transform = 'scale(1)';
+    }
+
+    function startSyncAnimation() {
+      setTimeout(() => { syncBar.style.width = '30%'; syncText.textContent = 'Authenticating...'; }, 500);
+      setTimeout(() => {
+        syncBar.style.width = '50%'; syncText.textContent = 'Fetching emails...';
+        document.querySelector('.gmail-icon').style.transform = 'scale(1.1)';
+      }, 1500);
+      setTimeout(() => {
+        syncBar.style.width = '70%'; syncText.textContent = 'Retrieving OTP...';
+        animateDataParticles();
+      }, 2500);
+      setTimeout(() => {
+        syncBar.style.width = '100%'; syncText.textContent = 'Sync complete!';
+        document.querySelector('.gmail-icon').style.transform = 'scale(1)';
+        document.querySelector('.minix-icon').style.transform = 'scale(1.1)';
+      }, 4000);
+    }
+
+    function animateDataParticles() {
+      const particles = document.querySelectorAll('.data-particle');
+      particles.forEach((particle, index) => {
+        setTimeout(() => {
+          particle.style.animation = 'moveParticle 0.8s ease-in-out';
+          particle.style.opacity = '1';
+        }, index * 400);
+      });
+    }
+
+    function startCountdown() {
+      clearInterval(countdownInterval);
+      let seconds = OTP_TIMER_DURATION;
+      countdownSpan.textContent = seconds;
+      otpTimerDiv.innerHTML = `Resend available in <span id="countdown">${seconds}</span>s`;
+      resendOTPButton.disabled = true;
+      resendOTPButton.style.opacity = 0.5;
+      resendOTPButton.style.cursor = 'default';
+
+      countdownInterval = setInterval(() => {
+        seconds--;
+        countdownSpan.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          otpTimerDiv.textContent = 'You can resend OTP now.';
+          resendOTPButton.disabled = false;
+          resendOTPButton.style.opacity = 1;
+          resendOTPButton.style.cursor = 'pointer';
+        }
+      }, 1000);
+    }
+
+    function moveToNext(currentInput, nextInputId) {
+      if (currentInput.value.length === currentInput.maxLength) {
+        const nextInput = document.getElementById(nextInputId);
+        if (nextInput) {
+          nextInput.focus();
+        } else {
+          verifyOTP(); // If it's the last input, try to verify
+        }
+      }
+    }
+
+    function handleOTPKey(event, prevInputId, nextInputId) {
+        const currentInput = event.target;
+        if (event.key === "Backspace" && currentInput.value === "") {
+            if (prevInputId) {
+                document.getElementById(prevInputId).focus();
+            }
+        } else if (event.key >= "0" && event.key <= "9") { // Only move if a digit is entered
+             moveToNext(currentInput, nextInputId);
+        }
+    }
+
+
+    function verifyOTP() {
+      const enteredOTP = otpInputs.map(input => input.value).join('');
+      if (enteredOTP.length !== 6) {
+          // Optionally show a message that OTP must be 6 digits
+          // For now, just don't proceed if not fully entered
+          return;
+      }
+
+      if (enteredOTP === generatedOTP) {
+        otpInputScreen.style.display = 'none';
+        successScreen.style.display = 'block';
+        document.querySelector('#success-screen .success-checkmark').style.display = 'block';
+        saveUserData();
+      } else {
+        otpInputScreen.style.display = 'none';
+        failureScreen.style.display = 'block';
+        document.querySelector('.otp-container').classList.add('shake');
+        setTimeout(() => document.querySelector('.otp-container').classList.remove('shake'), 500);
+      }
+    }
+
+    function showOTPScreen() {
+      failureScreen.style.display = 'none';
+      otpInputScreen.style.display = 'block';
+      clearOTPInputs();
+      otpInputs[0].focus();
+    }
+
+    function clearOTPInputs() {
+      otpInputs.forEach(input => input.value = '');
+    }
+
+    function closeOTPModal() {
+      otpModal.style.display = 'none';
+      clearInterval(countdownInterval);
+    }
+
+    function redirectToLogin() {
+      closeOTPModal();
+      switchTab('login');
+      document.getElementById('login-email').value = document.getElementById('signup-email').value;
+      document.getElementById('login-password').focus();
+    }
+
+    function resendOTP() {
+      if (resendOTPButton.disabled) return;
+      clearOTPInputs();
+      generateAndDisplayOTP();
+      showEmailOTP(); // Or a simpler notification
+      startCountdown();
+      otpInputs[0].focus();
+    }
+
+    function saveUserData() {
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const referralCode = document.getElementById('signup-referral').value; // Get referral code
+
+      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+      const newUser = { name, email, password, registrationDate: new Date().toISOString() };
+
+      if (referralCode.trim() !== "") { // Save referral code if provided
+        newUser.referralCode = referralCode.trim();
+      }
+
+      existingUsers.push(newUser);
+      localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+      console.log("User data saved:", newUser);
+    }
+
+    // --- Form Submission Logic ---
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initial setup
+      loadingOverlay.style.display = 'none'; // Hide loading overlay initially
+      generateStars();
+      window.addEventListener('resize', generateStars); // Regenerate stars on resize
+
+      // Login Form Submission
+      if (loginForm) {
+        loginForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          const emailInput = document.getElementById('login-email');
+          const passwordInput = document.getElementById('login-password');
+          const email = emailInput.value;
+          const password = passwordInput.value;
+
+          // Basic client-side validation
+          if (!email || !password) {
+            alert('Please enter both email and password.');
+            return;
+          }
+          if (!email.includes('@')) { // Simple email format check
+            validateEmail(emailInput); // Trigger visual validation
+            return;
+          }
+
+          const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+          const user = users.find(u => u.email === email && u.password === password);
+
+          if (user) {
+            loadingOverlay.style.display = 'flex';
+            document.querySelector('#loading-overlay .loading-text').textContent = "Logging you in...";
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userName', user.name);
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+          } else {
+            alert('Invalid email or password. Please try again or create an account.');
+            passwordInput.value = ''; // Clear password field
+            passwordInput.focus();
+            // Shake the form for visual feedback
+            loginForm.closest('.form-panel').classList.add('shake');
+            setTimeout(() => loginForm.closest('.form-panel').classList.remove('shake'), 500);
+          }
+        });
+      }
+
+      // Signup Form Submission
+      if (signupForm) {
+        signupForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          const nameInput = document.getElementById('signup-name');
+          const emailInput = document.getElementById('signup-email');
+          const passwordInput = document.getElementById('signup-password');
+          const termsCheckbox = document.getElementById('terms');
+
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          // Client-side validation
+          if (!name || !email || !password) {
+            alert('Please fill out all required fields (Name, Email, Password).');
+            return;
+          }
+          if (!email.includes('@')) {
+            validateEmail(emailInput);
+            return;
+          }
+          if (password.length < 6) { // Example: Minimum password length
+             alert('Password must be at least 6 characters long.');
+             passwordInput.focus();
+             passwordInput.closest('.input-group').classList.add('shake');
+             setTimeout(() => passwordInput.closest('.input-group').classList.remove('shake'), 500);
+             return;
+          }
+          if (!termsCheckbox.checked) {
+            alert('Please accept the Terms and Conditions.');
+            const termsGroup = termsCheckbox.closest('.input-group');
+            if (termsGroup) {
+              termsGroup.classList.add('shake');
+              setTimeout(() => termsGroup.classList.remove('shake'), 500);
+            }
+            return;
+          }
+
+          const existingUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+          if (existingUsers.some(user => user.email === email)) {
+            alert('An account with this email already exists. Please use a different email or login.');
+            switchTab('login');
+            document.getElementById('login-email').value = email;
+            document.getElementById('login-password').focus();
+            return;
+          }
+          showOTPModal();
+        });
+      }
+
+      // Check if user is already logged in
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        loadingOverlay.style.display = 'flex';
+        document.querySelector('#loading-overlay .loading-text').textContent = "Welcome back! Redirecting...";
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+      } else {
+        loadingOverlay.style.display = 'none'; // Ensure it's hidden if not logged in
+      }
+    });
+  </script>
+</body>
+</html>

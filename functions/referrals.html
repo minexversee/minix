@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MINIXVERSE - Refer &amp; Earn</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --primary: #4F6AFF;
+      --primary-light: #6685FF;
+      --primary-dark: #3B5BFF;
+      --secondary: #8B5CF6;
+      --accent: #FFFFFF;
+      --text-color: #f0f8ff;
+      --gradient-start: #4F6AFF;
+      --gradient-end: #8B5CF6;
+      --card-bg-transparent: rgba(255, 255, 255, 0.1);
+      --section-bg-transparent: rgba(10, 15, 30, 0.6);
+      --highlight: #38b000;
+      --deposit-color: #38b000;
+      --withdrawal-color: #ff3b3b;
+      --theme-positive: var(--primary);
+      --theme-negative: var(--secondary);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      display: flex;
+      color: var(--text-color);
+      background: transparent;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Stars Background */
+    .stars-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      background: linear-gradient(to bottom, #020111 10%, #050523 30%, #090942 70%, #0a0a40 90%);
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle linear infinite;
+    }
+
+    .star.medium {
+      width: 3px;
+      height: 3px;
+      opacity: 0.8;
+    }
+
+    .star.large {
+      width: 4px;
+      height: 4px;
+      opacity: 0.9;
+      box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: rgba(20, 30, 50, 0.8);
+      padding: 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .close-sidebar {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin: 40px 0 20px;
+      color: var(--primary);
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar a:hover, .sidebar a.active {
+      background: var(--primary);
+    }
+
+    .menu-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      margin-left: 220px;
+      transition: margin-left 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-content.sidebar-collapsed {
+      margin-left: 0;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background: var(--card-bg-transparent);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      margin: 15px 0;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.8);
+    }
+
+    .toggle-sidebar-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 22px;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-sidebar-btn:hover {
+      transform: scale(1.1);
+      color: var(--primary);
+    }
+
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.5);
+    }
+
+    /* Card Styles */
+    .card {
+      background: var(--card-bg-transparent);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    }
+
+    .card-title {
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.5);
+    }
+
+    .card-subtitle {
+      font-size: 16px;
+      color: var(--text-color);
+      text-align: center;
+      margin-bottom: 25px;
+      opacity: 0.8;
+    }
+
+    /* Referral Stats */
+    .referral-stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 0 0 20px;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .referral-stat-item {
+      text-align: center;
+      padding: 10px;
+      flex: 1;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+      text-shadow: 0 0 8px rgba(79, 106, 255, 0.5);
+      transition: all 0.3s;
+    }
+    
+    .stat-value.highlight {
+      animation: pulseHighlight 1.5s ease;
+    }
+    
+    @keyframes pulseHighlight {
+      0% { transform: scale(1); color: var(--primary); }
+      50% { transform: scale(1.1); color: var(--secondary); }
+      100% { transform: scale(1); color: var(--primary); }
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-color);
+      opacity: 0.8;
+    }
+
+    /* Rewards Info */
+    .rewards-info {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .reward-item {
+      text-align: center;
+      flex: 1;
+      min-width: 150px; /* Adjusted min-width */
+      background: rgba(20, 30, 50, 0.5);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .reward-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(79, 106, 255, 0.3);
+      border-color: var(--primary);
+    }
+    .reward-item.tier-bonus { /* Style for tier bonus items */
+        min-width: 120px;
+    }
+
+    .reward-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+      text-shadow: 0 0 8px rgba(79, 106, 255, 0.5);
+    }
+
+    .reward-label {
+      font-size: 14px;
+      color: var(--text-color);
+      opacity: 0.8;
+    }
+
+    .tier-progress-container {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(20, 30, 50, 0.3);
+        border-radius: 8px;
+        text-align: center;
+    }
+    .tier-progress-label {
+        font-size: 14px;
+        color: var(--text-color);
+        opacity: 0.8;
+        margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+        width: 100%;
+        background-color: rgba(0,0,0,0.3);
+        border-radius: 5px;
+        height: 10px;
+        overflow: hidden;
+    }
+    .progress-bar-fg {
+        height: 100%;
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        border-radius: 5px;
+        width: 0%; /* Will be set by JS */
+        transition: width 0.5s ease;
+    }
+    .next-bonus-info {
+        font-size: 12px;
+        color: var(--text-color);
+        opacity: 0.7;
+        margin-top: 8px;
+    }
+
+
+    /* Code Box */
+    .code-box {
+      background: rgba(20, 30, 50, 0.5);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 1px dashed var(--primary);
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(79, 106, 255, 0.2);
+    }
+
+    .code-label {
+      font-size: 14px;
+      color: var(--text-color);
+      margin-bottom: 5px;
+      opacity: 0.8;
+    }
+
+    .code-description {
+      font-size: 12px;
+      color: var(--text-color);
+      margin-bottom: 10px;
+      opacity: 0.6;
+      max-width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .referral-code {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.5);
+      transition: all 0.3s;
+    }
+
+    .referral-code.highlight {
+      animation: pulseHighlight 1.5s ease;
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(58, 134, 255, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(58, 134, 255, 0.3);
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(58, 134, 255, 0.2);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(58, 134, 255, 0.3);
+    }
+
+    /* Share Options */
+    .share-options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .share-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(20, 30, 50, 0.5);
+      color: var(--text-color);
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      min-width: 120px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(79, 106, 255, 0.3);
+      border-color: var(--primary);
+    }
+
+    .share-btn.whatsapp {
+      background: rgba(37, 211, 102, 0.2);
+      border-color: rgba(37, 211, 102, 0.3);
+    }
+
+    .share-btn.whatsapp:hover {
+      background: rgba(37, 211, 102, 0.3);
+      border-color: rgba(37, 211, 102, 0.5);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(37, 211, 102, 0.3);
+    }
+
+    .share-btn.telegram {
+      background: rgba(0, 136, 204, 0.2);
+      border-color: rgba(0, 136, 204, 0.3);
+    }
+
+    .share-btn.telegram:hover {
+      background: rgba(0, 136, 204, 0.3);
+      border-color: rgba(0, 136, 204, 0.5);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 136, 204, 0.3);
+    }
+
+    .share-btn.twitter {
+      background: rgba(29, 161, 242, 0.2);
+      border-color: rgba(29, 161, 242, 0.3);
+    }
+
+    .share-btn.twitter:hover {
+      background: rgba(29, 161, 242, 0.3);
+      border-color: rgba(29, 161, 242, 0.5);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(29, 161, 242, 0.3);
+    }
+
+    /* Referrals Table */
+    .referral-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .referral-table th {
+      background: rgba(20, 30, 50, 0.7);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-color);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .referral-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
+    }
+
+    .referral-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .referral-table tr:hover td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* New table row animation */
+    @keyframes newRowHighlight {
+      0% { background-color: rgba(79, 106, 255, 0.3); }
+      100% { background-color: transparent; }
+    }
+    
+    .new-referral {
+      animation: newRowHighlight 3s ease;
+    }
+
+    .status-active {
+      background-color: rgba(56, 176, 0, 0.15);
+      color: var(--highlight);
+      padding: 4px 10px;
+      border-radius: 25px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-pending {
+      background-color: rgba(255, 190, 11, 0.15);
+      color: #ffbe0b;
+      padding: 4px 10px;
+      border-radius: 25px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .no-referrals {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--text-color);
+      opacity: 0.6;
+    }
+
+    /* How It Works */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step {
+      display: flex;
+      gap: 15px;
+    }
+
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 18px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(58, 134, 255, 0.2);
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--accent);
+    }
+
+    .step-desc {
+      color: var(--text-color);
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* FAQ Section */
+    .faq-item {
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 15px;
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .faq-question {
+      font-weight: 600;
+      margin-bottom: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--accent);
+      transition: color 0.3s;
+    }
+
+    .faq-question:hover {
+      color: var(--primary);
+    }
+
+    .faq-answer {
+      color: var(--text-color);
+      font-size: 14px;
+      display: none;
+      padding: 5px 0 5px 10px;
+      border-left: 3px solid var(--primary);
+      margin-left: 5px;
+      opacity: 0.8;
+    }
+
+    .faq-answer.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 0.8; transform: translateY(0); }
+    }
+
+    /* Feedback */
+    .feedback {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Notification styles */
+    .notification-icon-container {
+      position: relative;
+      z-index: 1600;
+    }
+
+    .notification-icon {
+      cursor: pointer;
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 30, 50, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .notification-icon:hover {
+      background: rgba(79, 106, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .notification-bell {
+      font-size: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(79, 106, 255, 0.5);
+    }
+
+    .notification-popup {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      width: 350px;
+      background: rgba(20, 30, 50, 0.95);
+      border: 1px solid rgba(79, 106, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 106, 255, 0.5);
+      backdrop-filter: blur(10px);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .notification-popup.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .notification-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1400;
+      display: none;
+      backdrop-filter: blur(3px);
+    }
+    
+    .notification-overlay.active {
+      display: block;
+    }
+
+    .notification-popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .notification-popup-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.5);
+    }
+
+    .notification-popup-close {
+      font-size: 20px;
+      color: var(--accent);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: all 0.2s;
+    }
+
+    .notification-popup-close:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .notification-popup-content {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0 15px;
+    }
+
+    .notification-popup-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 15px 0;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: 8px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .alert-success {
+      background: rgba(56, 176, 0, 0.1);
+      border-left: 3px solid var(--deposit-color);
+    }
+
+    .alert-warning {
+      background: rgba(255, 170, 0, 0.1);
+      border-left: 3px solid #ffaa00;
+    }
+
+    .alert-info {
+      background: rgba(79, 106, 255, 0.1);
+      border-left: 3px solid var(--primary);
+    }
+
+    .alert-read {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid rgba(255, 255, 255, 0.1);
+      opacity: 0.6;
+    }
+
+    .alert-item:hover {
+      transform: translateX(5px);
+    }
+
+    .alert-icon {
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .success-icon {
+      background: rgba(56, 176, 0, 0.15);
+      color: var(--deposit-color);
+      border: 1px solid rgba(56, 176, 0, 0.3);
+    }
+
+    .warning-icon {
+      background: rgba(255, 170, 0, 0.15);
+      color: #ffaa00;
+      border: 1px solid rgba(255, 170, 0, 0.3);
+    }
+
+    .info-icon {
+      background: rgba(79, 106, 255, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(79, 106, 255, 0.3);
+    }
+
+    .alert-content {
+      flex-grow: 1;
+    }
+
+    .alert-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+
+    .alert-message {
+      font-size: 12px;
+      color: #a0aec0;
+      margin-bottom: 5px;
+      line-height: 1.4;
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .alert-dismiss {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      font-size: 16px;
+      color: #6b7280;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .alert-item:hover .alert-dismiss {
+      opacity: 0.7;
+    }
+
+    .alert-dismiss:hover {
+      opacity: 1 !important;
+      color: var(--accent);
+    }
+
+    .mark-all-read-btn, .view-all-alerts-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: all 0.2s;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .mark-all-read-btn:hover, .view-all-alerts-btn:hover {
+      background: rgba(79, 106, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Custom scrollbar for notification popup */
+    .notification-popup-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .notification-popup-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+    }
+
+    .notification-popup-content::-webkit-scrollbar-thumb {
+      background: rgba(79, 106, 255, 0.3);
+      border-radius: 2px;
+    }
+
+    .notification-popup-content::-webkit-scrollbar-thumb:hover {
+      background: rgba(79, 106, 255, 0.5);
+    }
+
+    /* Notification animation */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .alert-item {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+
+    footer a {
+      color: #a0aec0;
+      text-decoration: none;
+      margin: 0 10px;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    /* Responsive Styles */
+    @media screen and (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+      
+      .sidebar.mobile-hidden {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.mobile-visible {
+        transform: translateX(0);
+        z-index: 1001;
+      }
+
+      .notification-popup {
+        width: 300px;
+        right: 10px;
+      }
+      
+      .rewards-info {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .reward-item {
+        width: 100%;
+      }
+      
+      .share-options {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .share-btn {
+        width: 100%;
+      }
+      
+      .referral-table th:nth-child(4), /* Hide Total Invested */
+      .referral-table td:nth-child(4),
+      .referral-table th:nth-child(5), /* Hide Commission Earned */
+      .referral-table td:nth-child(5) {
+        display: none;
+      }
+
+      .step {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .step-number {
+        margin-bottom: 10px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .referral-code {
+        font-size: 20px;
+        letter-spacing: 1px;
+      }
+      
+      .card-title {
+        font-size: 20px;
+      }
+      
+      .header {
+        padding: 15px;
+      }
+
+      .page-title {
+        font-size: 20px;
+        padding: 15px 10px;
+      }
+
+      .logo-text {
+        font-size: 20px;
+      }
+    }
+
+    .menu-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+    }
+    </style>
+</head>
+<body>
+<!-- Stars Background -->
+<div class="stars-container" id="starsContainer"></div>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+<button class="close-sidebar" onclick="toggleSidebar()">×</button>
+<h2>Menu</h2>
+<a href="dashboard.html" onclick="setActiveMenu(this)">
+<span class="menu-icon">
+<svg class="icon-home" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+</span>
+            Home
+        </a>
+<a href="profile.html" onclick="setActiveMenu(this)">
+<span class="menu-icon">
+<svg class="icon-user" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+</span>
+            Profile
+        </a>
+<a onclick="openResetPasswordModal()">
+<span class="menu-icon">
+<svg class="icon-key" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+</svg>
+</span>
+            Reset Password
+        </a>
+<a class="active" href="#">
+<span class="menu-icon">
+<svg viewbox="0 0 24 24">
+<path d="M14 11h4a2 2 0 0 1 0 4h-4m-4 0H6a2 2 0 0 1 0-4h4m2-8v8m0 4v4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+  Referral
+</a>
+<a id="logoutButton" onclick="handleLogout()">
+<span class="menu-icon">
+<svg class="icon-logout" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+<polyline points="16 17 21 12 16 7"></polyline>
+<line x1="21" x2="9" y1="12" y2="12"></line>
+</svg>
+</span>
+            Logout
+        </a>
+</div>
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+<div class="header">
+<button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+<div class="logo-text">MINIXVERSE</div>
+<div class="notification-icon-container" id="notificationIconContainer" onclick="toggleNotifications()">
+<div class="notification-icon">
+<svg class="icon-bell" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+<path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+</svg>
+</div>
+<div class="notification-badge" id="notificationBadge">0</div>
+</div>
+</div>
+<!-- Notification Popup -->
+<div class="notification-overlay" id="notificationOverlay" onclick="closeNotificationOutside(event)"></div>
+<div class="notification-popup" id="notificationPopup">
+<div class="notification-popup-header">
+<div class="notification-popup-title">Notifications</div>
+<div style="display: flex; align-items: center; gap: 10px;">
+<button class="mark-all-read-btn" onclick="markAllNotificationsAsRead()">Mark all as read</button>
+<span class="notification-popup-close" onclick="toggleNotifications()">×</span>
+</div>
+</div>
+<div class="notification-popup-content">
+<div class="alerts-list" id="alertsList">
+<!-- Alert items will be populated here -->
+<div style="text-align: center; color: #a0aec0; padding: 20px;">No notifications yet.</div>
+</div>
+</div>
+<div class="notification-popup-footer">
+<button class="view-all-alerts-btn">View all notifications</button>
+</div>
+</div>
+<div class="page-title">REFER &amp; EARN</div>
+<div class="container">
+<div class="card">
+<div class="card-title">Invite Friends &amp; Earn Rewards</div>
+<div class="card-subtitle">Earn commissions and bonuses when friends join and invest.</div>
+<div class="rewards-info">
+<div class="reward-item">
+<div class="reward-value">5%</div>
+<div class="reward-label">Commission on Investment</div>
+</div>
+<div class="reward-item tier-bonus">
+<div class="reward-value">$100</div>
+<div class="reward-label">11+ Members Bonus</div>
+</div>
+<div class="reward-item tier-bonus">
+<div class="reward-value">$250</div>
+<div class="reward-label">21+ Members Bonus</div>
+</div>
+<div class="reward-item tier-bonus">
+<div class="reward-value">$700</div>
+<div class="reward-label">51+ Members Bonus</div>
+</div>
+</div>
+<div class="tier-progress-container">
+    <div class="tier-progress-label">Progress to Next Tier Bonus</div>
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fg" id="tierProgressBar"></div>
+    </div>
+    <div class="next-bonus-info" id="nextBonusInfo">Refer more friends to unlock bonuses!</div>
+</div>
+<div class="code-box">
+<div class="code-label">Your Personal Referral Code</div>
+<div class="code-description">Share this code with your friends.</div>
+<div class="referral-code" id="referralCode">XXXXXX</div>
+<button class="copy-btn" onclick="copyCode()">
+<span>Copy Code</span>
+</button>
+</div>
+<div class="share-options">
+<a class="share-btn whatsapp" href="#" onclick="shareViaWhatsApp(); return false;">
+<span>WhatsApp</span>
+</a>
+<a class="share-btn telegram" href="#" onclick="shareViaTelegram(); return false;">
+<span>Telegram</span>
+</a>
+<a class="share-btn twitter" href="#" onclick="shareViaTwitter(); return false;">
+<span>Twitter</span>
+</a>
+</div>
+</div>
+<div class="card">
+<div class="card-title">Your Referrals</div>
+<div class="referral-stats">
+<div class="referral-stat-item">
+<div class="stat-value" id="totalReferrals">0</div>
+<div class="stat-label">Total Referrals</div>
+</div>
+<div class="referral-stat-item">
+<div class="stat-value" id="activeReferrals">0</div>
+<div class="stat-label">Active Referrals</div>
+</div>
+<div class="referral-stat-item">
+<div class="stat-value" id="totalEarned">$0</div>
+<div class="stat-label">Total Earned</div>
+</div>
+</div>
+<table class="referral-table">
+<thead>
+<tr>
+<th>User</th>
+<th>Date Joined</th>
+<th>Status</th>
+<th>Total Invested ($)</th>
+<th>Commission Earned ($)</th>
+</tr>
+</thead>
+<tbody id="referralsBody">
+<!-- Dynamically populated by JavaScript -->
+</tbody>
+</table>
+<div class="no-referrals" id="noReferrals">
+                    You haven't referred anyone yet. Share your code to start earning!
+                </div>
+</div>
+<div class="card">
+<div class="card-title">How It Works</div>
+<div class="steps">
+<div class="step">
+<div class="step-number">1</div>
+<div class="step-content">
+<div class="step-title">Share Your Code</div>
+<div class="step-desc">Share your unique referral code with friends.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-number">2</div>
+<div class="step-content">
+<div class="step-title">Friends Join & Invest</div>
+<div class="step-desc">Your friends sign up using your code and make an investment (min $110).</div>
+</div>
+</div>
+<div class="step">
+<div class="step-number">3</div>
+<div class="step-content">
+<div class="step-title">Earn Commissions</div>
+<div class="step-desc">You earn a 5% commission on their investment amount.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-number">4</div>
+<div class="step-content">
+<div class="step-title">Unlock Tier Bonuses</div>
+<div class="step-desc">Earn additional cash bonuses as you refer more members (11, 21, 51+).</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">Frequently Asked Questions</div>
+<div class="faq-item">
+<div class="faq-question" onclick="toggleFaq(this)">
+<span>How do I refer a friend?</span>
+<span>+</span>
+</div>
+<div class="faq-answer">
+                        Simply share your unique referral code. Friends enter it during registration.
+                    </div>
+</div>
+<div class="faq-item">
+<div class="faq-question" onclick="toggleFaq(this)">
+<span>When do I get referral commissions?</span>
+<span>+</span>
+</div>
+<div class="faq-answer">
+                        You receive a 5% commission instantly when your referred friend makes an investment. Minimum investment for them is $110.
+                    </div>
+</div>
+<div class="faq-item">
+<div class="faq-question" onclick="toggleFaq(this)">
+<span>How do tier bonuses work?</span>
+<span>+</span>
+</div>
+<div class="faq-answer">
+                        Tier bonuses are awarded when your total number of referred members reaches specific milestones: $100 for 11 members, $250 for 21 members, and $700 for 51 members. These are one-time bonuses per tier reached.
+                    </div>
+</div>
+<div class="faq-item">
+<div class="faq-question" onclick="toggleFaq(this)">
+<span>Is there a limit to referrals?</span>
+<span>+</span>
+</div>
+<div class="faq-answer">
+                        No, refer as many friends as you like and keep earning!
+                    </div>
+</div>
+</div>
+</div>
+<footer>
+<p>© 2025 MINIXVERSE. All rights reserved.</p>
+<p style="font-size: 0.8rem; margin-top: 10px; color: #a0aec0;">
+<a href="#">Privacy Policy</a> |
+                <a href="#">Terms of Service</a> |
+                <a href="#">Legal</a>
+</p>
+</footer>
+</div>
+<!-- Feedback Toast Notification -->
+<div class="feedback" id="feedback"></div>
+<script>
+        // Global variables
+        let notificationCount = 0;
+        let referrals_list = []; 
+        
+        const randomUsernames = [ // Kept for potential manual testing via console if desired
+            "crypto_wizard", "blockchain_guru", "token_master", "defi_lover", 
+            "nft_collector", "hodler_123", "satoshi_fan", "eth_miner", 
+            "web3_dev", "metaverse_explorer", "diamond_hands", "moon_chaser"
+        ];
+
+        const BONUS_TIERS = {
+            11: { bonus_amount: 100, tier_name: "11 Members" },
+            21: { bonus_amount: 250, tier_name: "21 Members" },
+            51: { bonus_amount: 700, tier_name: "51 Members" },
+        };
+        const MIN_INVESTMENT_FOR_COMMISSION = 110;
+        
+        function isLocalStorageAvailable() {
+            try {
+                const test = 'test';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        const mockStorageData = {
+            'isLoggedIn': 'true',
+            'userEmail': 'john.doe@example.com',
+            'userName': 'John Doe',
+            'kycVerified': 'true',
+            'kycEmail': 'john.doe@example.com',
+            'kycMobile': '+91 9876543210',
+            'kycAadhaar': '123456789012',
+            'kycPan': 'ABCPD1234F',
+            // Referral specific data will be reset/initialized
+            'referrals_list': '[]',
+            'referral_balance_dollars': '0',
+            'last_tier_bonus_awarded_level': '0'
+        };
+        
+        const mockStorage = {
+            getItem: function(key) { return mockStorageData[key] || null; },
+            setItem: function(key, value) { mockStorageData[key] = value; },
+            removeItem: function(key) { delete mockStorageData[key]; }
+        };
+
+        function getStorage() {
+            return isLocalStorageAvailable() ? localStorage : mockStorage;
+        }
+
+        function clearReferralDataFromStorage() {
+            const storage = getStorage();
+            storage.removeItem('referrals_list');
+            storage.removeItem('referral_balance_dollars');
+            storage.removeItem('last_tier_bonus_awarded_level');
+
+            // Also reset in-memory mock storage if it's being used
+            if (storage === mockStorage) {
+                mockStorageData['referrals_list'] = '[]';
+                mockStorageData['referral_balance_dollars'] = '0';
+                mockStorageData['last_tier_bonus_awarded_level'] = '0';
+            }
+        }
+        
+        function generateReferralCode() {
+            const storage = getStorage();
+            const name = storage.getItem('userName') || 'John Doe';
+            const aadhaar = storage.getItem('kycAadhaar') || '123456789012';
+            const pan = storage.getItem('kycPan') || 'ABCPD1234F';
+            const nameChars = name.replace(/[^a-zA-Z]/g, '').substring(0, 2).toUpperCase();
+            const aadhaarDigits = aadhaar.replace(/[^0-9]/g, '').slice(-4);
+            const panChars = pan.replace(/[^a-zA-Z0-9]/g, '').substring(4, 6).toUpperCase();
+            let code = nameChars + aadhaarDigits + panChars;
+            if (code.length < 8) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                while (code.length < 8) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+            } else if (code.length > 8) {
+                code = code.substring(0, 8);
+            }
+            return code;
+        }
+        
+        function copyCode() {
+            const codeElement = document.getElementById('referralCode');
+            const code = codeElement.textContent;
+            if (code === 'XXXXXX') { 
+                showFeedback("Please wait, your code is being generated...", true);
+                return;
+            }
+            navigator.clipboard.writeText(code).then(() => {
+                showFeedback("Referral code copied to clipboard!");
+                codeElement.classList.add('highlight');
+                setTimeout(() => codeElement.classList.remove('highlight'), 1500);
+            }).catch(err => showFeedback("Failed to copy code: " + err, true));
+        }
+        
+        function showFeedback(message, isError = false) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.style.background = isError ? 
+                "var(--theme-negative)" : 
+                "linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)";
+            feedback.style.opacity = 1;
+            setTimeout(() => feedback.style.opacity = 0, 3000);
+        }
+        
+        function updateReferralsTable() {
+            const tbody = document.getElementById('referralsBody');
+            const noReferrals = document.getElementById('noReferrals');
+            if (!tbody || !noReferrals) return;
+
+            tbody.innerHTML = '';
+            // referrals_list is already loaded by loadInitialData or updated by addNewReferral
+            
+            if (referrals_list.length === 0) {
+                noReferrals.style.display = 'block';
+            } else {
+                noReferrals.style.display = 'none';
+                referrals_list.forEach(referral => {
+                    const row = document.createElement('tr');
+                    row.id = `referral-${referral.id}`;
+                    if (referral.isNew) {
+                        row.classList.add('new-referral');
+                        // Client-side only flag, no need to persist 'isNew' after animation
+                        setTimeout(() => {
+                            const currentReferral = referrals_list.find(r => r.id === referral.id);
+                            if(currentReferral) currentReferral.isNew = false;
+                         }, 3000);
+                    }
+                    row.innerHTML = `
+                        <td>${referral.user}</td>
+                        <td>${referral.date}</td>
+                        <td><span class="status-${referral.status}">${referral.status.charAt(0).toUpperCase() + referral.status.slice(1)}</span></td>
+                        <td>$${(referral.total_invested_by_them || 0).toFixed(2)}</td>
+                        <td>$${(referral.commission_earned_from_them || 0).toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+            updateReferralStats();
+        }
+        
+        function updateReferralStats() {
+            const storage = getStorage();
+            const totalReferralsEl = document.getElementById('totalReferrals');
+            const activeReferralsEl = document.getElementById('activeReferrals');
+            const totalEarnedEl = document.getElementById('totalEarned');
+
+            if (totalReferralsEl && activeReferralsEl && totalEarnedEl) {
+                const activeCount = referrals_list.filter(r => r.status === 'active').length;
+                const totalCount = referrals_list.length;
+                const earnedDollars = parseFloat(storage.getItem('referral_balance_dollars') || '0');
+                
+                totalReferralsEl.textContent = totalCount;
+                activeReferralsEl.textContent = activeCount;
+                totalEarnedEl.textContent = `$${earnedDollars.toFixed(2)}`;
+                
+                ['totalReferrals', 'activeReferrals', 'totalEarned'].forEach(id => {
+                    const el = document.getElementById(id);
+                    const prevVal = el.getAttribute('data-prev') || (id === 'totalEarned' ? '$0.00' : '0');
+                    const currentVal = el.textContent;
+                    if (currentVal !== prevVal) {
+                        el.classList.remove('highlight');
+                        void el.offsetWidth; 
+                        el.classList.add('highlight');
+                    }
+                    el.setAttribute('data-prev', currentVal);
+                });
+            }
+            updateTierProgress();
+        }
+
+        function updateTierProgress() {
+            const storage = getStorage();
+            const progressBar = document.getElementById('tierProgressBar');
+            const nextBonusInfoEl = document.getElementById('nextBonusInfo');
+            if (!progressBar || !nextBonusInfoEl) return;
+
+            const currentReferrals = referrals_list.length;
+            const lastBonusLevel = parseInt(storage.getItem('last_tier_bonus_awarded_level') || '0');
+            
+            let nextTierCount = 0;
+            let nextBonusAmount = 0;
+            let progressPercent = 100; 
+
+            const sortedTiers = Object.keys(BONUS_TIERS).map(Number).sort((a, b) => a - b);
+            
+            for (const tier of sortedTiers) {
+                if (tier > lastBonusLevel) {
+                    nextTierCount = tier;
+                    nextBonusAmount = BONUS_TIERS[tier].bonus_amount;
+                    break;
+                }
+            }
+
+            if (nextTierCount > 0) { 
+                const referralsForThisSegment = nextTierCount - lastBonusLevel;
+                const referralsMadeInThisSegment = Math.max(0, currentReferrals - lastBonusLevel); // Ensure not negative
+                progressPercent = Math.min(100, (referralsMadeInThisSegment / referralsForThisSegment) * 100);
+                nextBonusInfoEl.textContent = `Refer ${Math.max(0,nextTierCount - currentReferrals)} more for $${nextBonusAmount} bonus! (${currentReferrals}/${nextTierCount})`;
+            } else { 
+                progressPercent = 100;
+                nextBonusInfoEl.textContent = "Congratulations! All tier bonuses achieved!";
+            }
+            progressBar.style.width = `${progressPercent}%`;
+        }
+        
+        // This function can be called manually from console for testing if needed
+        function addNewReferral(user) {
+            const today = new Date();
+            const formattedDate = `${today.toLocaleString('default', { month: 'short' })} ${today.getDate()}, ${today.getFullYear()}`;
+            
+            const newReferral = {
+                id: referrals_list.length > 0 ? Math.max(...referrals_list.map(r => r.id)) + 1 : 1,
+                user: user,
+                date: formattedDate,
+                status: 'pending',
+                total_invested_by_them: 0,
+                commission_earned_from_them: 0,
+                isNew: true
+            };
+            
+            referrals_list.unshift(newReferral);
+            const storage = getStorage();
+            storage.setItem('referrals_list', JSON.stringify(referrals_list));
+            
+            updateReferralsTable(); 
+            checkAndAwardTierBonuses();
+
+            addNewNotification('New Referral Joined', `${user} has signed up using your code!`, 'info');
+            // activateReferral(newReferral.id); // Optionally call activate if you want auto-activation for manual adds
+            return newReferral;
+        }
+
+        function checkAndAwardTierBonuses() {
+            const storage = getStorage();
+            const currentTotalReferrals = referrals_list.length;
+            let lastAwardedLevel = parseInt(storage.getItem('last_tier_bonus_awarded_level') || '0');
+            let currentBalance = parseFloat(storage.getItem('referral_balance_dollars') || '0');
+            let bonusAwardedThisCheck = false;
+
+            const sortedTiers = Object.keys(BONUS_TIERS).map(Number).sort((a, b) => a - b);
+
+            for (const tierLevel of sortedTiers) {
+                if (currentTotalReferrals >= tierLevel && lastAwardedLevel < tierLevel) {
+                    const bonusData = BONUS_TIERS[tierLevel];
+                    currentBalance += bonusData.bonus_amount;
+                    lastAwardedLevel = tierLevel; 
+                    
+                    addNewNotification('Tier Bonus Unlocked!', `Congratulations! You earned $${bonusData.bonus_amount} for reaching ${tierLevel} referrals.`, 'success');
+                    bonusAwardedThisCheck = true;
+                }
+            }
+
+            if (bonusAwardedThisCheck) {
+                storage.setItem('referral_balance_dollars', currentBalance.toFixed(2));
+                storage.setItem('last_tier_bonus_awarded_level', lastAwardedLevel.toString());
+                updateReferralStats();
+            }
+        }
+        
+        // This function can be called manually from console for testing if needed
+        function activateReferral(id) {
+            setTimeout(() => {
+                const referral = referrals_list.find(r => r.id === id);
+                if (referral && referral.status === 'pending') {
+                    referral.status = 'active';
+                    const storage = getStorage();
+                    storage.setItem('referrals_list', JSON.stringify(referrals_list));
+                    updateReferralsTable();
+                    addNewNotification('Referral Activated', `${referral.user} is now active!`, 'info');
+                }
+            }, 2000); // Reduced delay for manual testing if desired
+        }
+        
+        function loadInitialData() {
+            const storage = getStorage();
+            // Ensure essential items exist in storage and are initialized if null (after clearReferralDataFromStorage)
+            if (storage.getItem('referrals_list') === null) storage.setItem('referrals_list', '[]');
+            if (storage.getItem('referral_balance_dollars') === null) storage.setItem('referral_balance_dollars', '0');
+            if (storage.getItem('last_tier_bonus_awarded_level') === null) storage.setItem('last_tier_bonus_awarded_level', '0');
+
+            const storedReferrals = storage.getItem('referrals_list');
+            try {
+                referrals_list = storedReferrals ? JSON.parse(storedReferrals) : [];
+            } catch (e) {
+                referrals_list = [];
+                storage.setItem('referrals_list', '[]'); 
+            }
+            updateReferralsTable(); 
+        }
+        
+        function shareViaWhatsApp() {
+            const code = document.getElementById('referralCode').textContent;
+            const message = `Join MINIXVERSE with my code: ${code} & earn rewards! Invest (min $110) & I get 5% commission. https://minixverse.io/signup?ref=${code}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+        
+        function shareViaTelegram() {
+            const code = document.getElementById('referralCode').textContent;
+            const message = `Join MINIXVERSE with my code: ${code} & earn rewards! Invest (min $110) & I get 5% commission.`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent('https://minixverse.io/signup?ref='+code)}&text=${encodeURIComponent(message)}`, '_blank');
+        }
+        
+        function shareViaTwitter() {
+            const code = document.getElementById('referralCode').textContent;
+            const message = `Join MINIXVERSE with code ${code}! I earn 5% if you invest (min $110). #MINIXVERSE #Referral`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent('https://minixverse.io/signup?ref=' + code)}`, '_blank');
+        }
+        
+        function toggleFaq(element) {
+            if (!element) return;
+            const answer = element.nextElementSibling;
+            if (!answer) return;
+            const isActive = answer.classList.contains('active');
+            document.querySelectorAll('.faq-answer.active').forEach(ans => ans.classList.remove('active'));
+            document.querySelectorAll('.faq-question').forEach(q => { if (q.lastElementChild) q.lastElementChild.textContent = '+';});
+            if (!isActive) {
+                answer.classList.add('active');
+                if (element.lastElementChild) element.lastElementChild.textContent = '−';
+            }
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (!badge) return;
+            badge.textContent = notificationCount;
+            badge.style.display = notificationCount === 0 ? 'none' : 'flex';
+        }
+        
+        function addNewNotification(title, message, type = 'info') {
+            notificationCount++;
+            updateNotificationBadge();
+
+            const alertsList = document.getElementById('alertsList');
+            if (alertsList) {
+                const placeholder = alertsList.querySelector('div[style*="text-align: center"]');
+                if (placeholder) placeholder.remove();
+                
+                let iconContent = 'i', iconClass = 'info-icon';
+                if (type === 'success') { iconContent = '✓'; iconClass = 'success-icon'; }
+                else if (type === 'warning') { iconContent = '!'; iconClass = 'warning-icon'; }
+                
+                const notificationElement = document.createElement('div');
+                notificationElement.classList.add('alert-item', `alert-${type}`);
+                notificationElement.dataset.id = Date.now();
+                notificationElement.innerHTML = `
+                    <div class="alert-icon"><div class="icon-circle ${iconClass}">${iconContent}</div></div>
+                    <div class="alert-content">
+                        <div class="alert-title">${title}</div>
+                        <div class="alert-message">${message}</div>
+                        <div class="alert-time">Just now</div>
+                    </div>
+                    <div class="alert-dismiss" onclick="dismissNotification(this)">×</div>`;
+                alertsList.prepend(notificationElement);
+            }
+        }
+        
+        function dismissNotification(element) {
+            if (!element) return;
+            const alertItem = element.closest('.alert-item');
+            if (!alertItem) return;
+            alertItem.style.opacity = "0";
+            alertItem.style.transform = "translateX(30px)";
+            setTimeout(() => {
+                alertItem.remove();
+                notificationCount = Math.max(0, notificationCount - 1);
+                updateNotificationBadge();
+                const alertsList = document.getElementById('alertsList');
+                if (alertsList && alertsList.children.length === 0) {
+                    alertsList.innerHTML = '<div style="text-align: center; color: #a0aec0; padding: 20px;">No notifications yet.</div>';
+                }
+            }, 300);
+        }
+        
+        function markAllNotificationsAsRead() {
+            document.querySelectorAll('.alert-item:not(.alert-read)').forEach(item => { 
+                item.classList.remove('alert-success', 'alert-warning', 'alert-info');
+                item.classList.add('alert-read');
+            });
+            notificationCount = 0; 
+            updateNotificationBadge();
+        }
+        
+        function toggleNotifications() {
+            const popup = document.getElementById('notificationPopup');
+            const overlay = document.getElementById('notificationOverlay');
+            if (!popup || !overlay) return;
+            const isActive = popup.classList.toggle('active');
+            overlay.classList.toggle('active', isActive); 
+        }
+        
+        function closeNotificationOutside(event) {
+            if (event.target === document.getElementById('notificationOverlay')) {
+                toggleNotifications();
+            }
+        }
+        
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            if (!container) return;
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                const x = Math.random() * 100, y = Math.random() * 100;
+                const type = Math.random();
+                if (type > 0.85) star.className = 'star large';
+                else if (type > 0.6) star.className = 'star medium';
+                else star.className = 'star';
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.animationDuration = `${Math.random() * 7 + 3}s`;
+                star.style.animationDelay = `${Math.random() * 10}s`;
+                container.appendChild(star);
+            }
+        }
+        
+        function setActiveMenu(element) {
+            if (!element) return;
+            document.querySelectorAll('.sidebar a.active').forEach(a => a.classList.remove('active'));
+            element.classList.add('active');
+        }
+        
+        function handleLogout() {
+            if (confirm("Are you sure you want to log out?")) {
+                getStorage().removeItem('isLoggedIn'); // Only remove login status, not all user data for this demo
+                showFeedback('Logged out successfully');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            clearReferralDataFromStorage(); // Reset referral data on every load
+            createStars();
+            loadInitialData();
+            
+            const referralCodeElement = document.getElementById('referralCode');
+            if (referralCodeElement) {
+                setTimeout(() => { 
+                    const code = generateReferralCode();
+                    referralCodeElement.textContent = code;
+                    referralCodeElement.classList.add('highlight');
+                    setTimeout(() => referralCodeElement.classList.remove('highlight'), 1500);
+                    // No automatic notification for code generation unless specifically desired
+                }, 1000);
+            }
+            
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('mobile-hidden');
+                document.getElementById('mainContent').classList.add('sidebar-collapsed');
+            }
+            
+            updateNotificationBadge();
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('mainContent');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                sidebar.classList.toggle('mobile-hidden');
+                sidebar.classList.toggle('mobile-visible');
+            } else {
+                sidebar.classList.toggle('hidden');
+            }
+            main.classList.toggle('sidebar-collapsed');
+        }
+        
+        function openResetPasswordModal() {
+            showFeedback("Reset password functionality will be available soon.");
+        }
+    </script>
+</body>
+</html>

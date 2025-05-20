@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Minixverse - Futuristic Theme</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --primary: #4F6AFF;
+      --primary-light: #6685FF;
+      --primary-dark: #3B5BFF;
+      --secondary: #8B5CF6;
+      --accent: #FFFFFF;
+      --text-color: #f0f8ff;
+      --gradient-start: #4F6AFF;
+      --gradient-end: #8B5CF6;
+      --card-bg-transparent: rgba(255, 255, 255, 0.1);
+      --section-bg-transparent: rgba(10, 15, 30, 0.6);
+      --highlight: #38b000; /* Original green highlight */
+      --status-pending: #ffaa00; /* Yellow for pending */
+      /* Redefined theme colors for clarity */
+      --theme-positive: #4F6AFF; /* Blue */
+      --theme-negative: #8B5CF6; /* Purple */
+      --theme-success: #4F6AFF; /* Explicit success state (Blue) */
+      --theme-failed: #8B5CF6; /* Explicit failed state (Purple) */
+       /* Use explicit theme colors for deposit/withdrawal */
+      --deposit-color: var(--theme-positive);
+      --withdrawal-color: var(--theme-negative);
+      --secondary-rgb: 139, 92, 246; /* For box-shadow with opacity */
+
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      display: flex;
+      color: var(--text-color);
+      background: transparent;
+      position: relative;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+     /* Class added when any modal or mobile sidebar is open */
+     body.modal-open {
+       overflow: hidden;
+     }
+
+    .stars-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      background: linear-gradient(to bottom, #020111 10%, #050523 30%, #090942 70%, #0a0a40 90%);
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle linear infinite;
+    }
+
+    .star.medium {
+      width: 3px;
+      height: 3px;
+      opacity: 0.8;
+    }
+
+    .star.large {
+      width: 4px;
+      height: 4px;
+      opacity: 0.9;
+      box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgba(20, 30, 50, 0.8);
+      padding: 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+     /* Mobile specific states */
+     .sidebar.mobile-hidden {
+        transform: translateX(-100%);
+     }
+     .sidebar.mobile-visible {
+        transform: translateX(0);
+        z-index: 1001; /* Ensure sidebar is above main content */
+     }
+
+
+    .close-sidebar {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin: 40px 0 20px;
+      color: var(--primary);
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar a:hover, .sidebar a.active {
+      background: var(--primary);
+    }
+
+    .menu-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Icon styles for SVG icons */
+    .icon-home, .icon-user, .icon-key, .icon-chain, .icon-logout, .icon-investor, .icon-info { /* Added .icon-investor, .icon-info */
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      margin-left: 220px; /* Default margin when sidebar is open */
+      transition: margin-left 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-content.sidebar-collapsed {
+      margin-left: 0; /* Margin when sidebar is closed */
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .header, .summary-box, .wallet-box, .quick-links-section, .referral-link-section, .countdown-box {
+      background: var(--card-bg-transparent);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+    }
+     .summary-box, .wallet-box, .quick-links-section, .referral-link-section, .countdown-box {
+         margin: 15px 0;
+     }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(79, 106, 255, 0.8);
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toggle-sidebar-btn {
+      background: transparent; border: none; color: var(--accent);
+      padding: 8px 12px; border-radius: 5px; cursor: pointer;
+      font-size: 22px; transition: all 0.3s ease;
+    }
+    .toggle-sidebar-btn:hover { transform: scale(1.1); color: var(--primary); }
+
+    /* Notification Icon & Badge */
+    .notification-icon-container { position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+    .notification-icon { color: var(--accent); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
+    .notification-icon:hover { transform: scale(1.1); border-color: var(--primary); color: var(--primary); }
+    .icon-bell { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .notification-badge { position: absolute; top: -5px; right: -5px; background: linear-gradient(135deg, #FF5252 0%, var(--secondary) 100%); color: white; font-size: 12px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    /* Notification Popup */
+    .notification-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1999; display: none; }
+    .notification-overlay.active { display: block; }
+    .notification-popup { position: absolute; top: 80px; right: 30px; width: 350px; max-height: 500px; background: rgba(20, 30, 50, 0.95); border: 1px solid rgba(79, 106, 255, 0.3); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 106, 255, 0.5); backdrop-filter: blur(10px); transform: translateY(-20px); opacity: 0; transition: transform 0.3s, opacity 0.3s; z-index: 2000; }
+    .notification-popup.active { transform: translateY(0); opacity: 1; }
+    .notification-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .notification-title { font-size: 16px; font-weight: bold; color: var(--accent); }
+    .notification-actions { display: flex; gap: 15px; }
+    .mark-all-read-btn { background: transparent; border: none; color: var(--primary-light); font-size: 12px; cursor: pointer; transition: color 0.2s; }
+    .mark-all-read-btn:hover { color: var(--primary); text-decoration: underline; }
+    .close-notifications { background: transparent; border: none; color: var(--accent); font-size: 18px; cursor: pointer; transition: all 0.2s; }
+    .close-notifications:hover { color: var(--primary); transform: scale(1.1); }
+    .notification-content { max-height: 400px; overflow-y: auto; padding: 10px 0; }
+    .alert-item { display: flex; padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s, transform 0.2s, opacity 0.3s; animation: slideIn 0.3s forwards; }
+    .alert-item:hover { background: rgba(255, 255, 255, 0.05); }
+    .alert-item:last-child { border-bottom: none; }
+    .alert-icon { margin-right: 15px; display: flex; align-items: flex-start; }
+    .alert-content { flex: 1; }
+    .alert-title { font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+    .alert-message { font-size: 12px; color: #a0aec0; margin-bottom: 5px; }
+    .alert-time { font-size: 10px; color: #718096; }
+    .alert-dismiss { color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 16px; transition: color 0.2s; padding: 0 5px; }
+    .alert-dismiss:hover { color: var(--accent); }
+    .alert-success .alert-title, .icon-circle.success-icon { color: var(--theme-success); }
+    .success-icon { background: rgba(79, 106, 255, 0.15); border: 1px solid rgba(79, 106, 255, 0.3); color: var(--theme-success); }
+    .alert-warning .alert-title, .icon-circle.warning-icon { color: var(--status-pending); }
+    .warning-icon { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.3); color: var(--status-pending); }
+    .alert-info .alert-title, .icon-circle.info-icon { color: var(--primary-light); }
+    .info-icon { background: rgba(102, 133, 255, 0.15); border: 1px solid rgba(102, 133, 255, 0.3); color: var(--primary-light); }
+    .alert-error .alert-title, .icon-circle.error-icon { color: var(--theme-failed); }
+    .error-icon { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--theme-failed); }
+    .alert-read { opacity: 0.6; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* Scrollbar Styles */
+    .notification-content::-webkit-scrollbar, #referralListContainer::-webkit-scrollbar, #historyListContainer::-webkit-scrollbar, .modal-container::-webkit-scrollbar, #bonusProgramModal .modal-content::-webkit-scrollbar { width: 6px; }
+    .notification-content::-webkit-scrollbar-track, #referralListContainer::-webkit-scrollbar-track, #historyListContainer::-webkit-scrollbar-track, .modal-container::-webkit-scrollbar-track, #bonusProgramModal .modal-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
+    .notification-content::-webkit-scrollbar-thumb, #referralListContainer::-webkit-scrollbar-thumb, #historyListContainer::-webkit-scrollbar-thumb, .modal-container::-webkit-scrollbar-thumb, #bonusProgramModal .modal-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+    .notification-content::-webkit-scrollbar-thumb:hover, #referralListContainer::-webkit-scrollbar-thumb:hover, #historyListContainer::-webkit-scrollbar-thumb:hover, .modal-container::-webkit-scrollbar-thumb:hover, #bonusProgramModal .modal-content::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+    .welcome-section { text-align: center; margin: 30px 0; text-shadow: 0 0 10px rgba(79, 106, 255, 0.5); }
+    .wallet-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .wallet-box { margin: 0; padding: 20px; }
+    .wallet-title { font-size: 16px; margin-bottom: 10px; color: var(--accent); }
+    .wallet-amount { font-size: 22px; font-weight: bold; color: var(--primary); text-shadow: 0 0 5px rgba(79, 106, 255, 0.5); }
+    .summary-title { text-align: center; font-size: 20px; color: var(--accent); margin-bottom: 20px; }
+
+    /* Base Button Styles */
+    .transfer-btn, .transaction-btn, .btn { background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%); border: none; color: white; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+    .transfer-btn:hover, .transaction-btn:hover, .btn:hover { transform: translateY(-1px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
+
+    /* Transaction Input Styles */
+    .transaction-container { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+    .transaction-input { width: 100%; padding: 14px 18px; font-size: 16px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.1); background-color: rgba(20, 30, 50, 0.3); color: var(--text-color); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); outline: none; box-shadow: 0 0 0 rgba(79, 106, 255, 0); }
+    .transaction-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(79, 106, 255, 0.3); background-color: rgba(79, 106, 255, 0.1); }
+    .transaction-input::placeholder { color: rgba(255, 255, 255, 0.4); transition: all 0.3s; }
+    .transaction-input:focus::placeholder { opacity: 0; transform: translateY(-10px); }
+    .input-label { display: block; margin-bottom: 8px; color: var(--primary-light); font-size: 14px; }
+    .input-wrapper { width: 100%; position: relative;}
+    .amount-feedback { position: absolute; font-size: 12px; right: 15px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.3s, transform 0.3s; font-weight: bold; }
+    .amount-feedback.show { opacity: 1; transform: translateY(-50%); }
+    .amount-feedback.deposit { color: var(--theme-positive); text-shadow: 0 0 5px rgba(79, 106, 255, 0.5); }
+    .amount-feedback.withdraw { color: var(--theme-negative); text-shadow: 0 0 5px rgba(139, 92, 246, 0.6); }
+
+    /* Balance Display on Main Page (Transaction Summary) */
+    .balance-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; padding: 0; text-align: left; }
+    .balance-item { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .balance-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .balance-display .balance-label { font-size: 13px; color: #a0aec0; margin-bottom: 5px; }
+    .balance-display .balance-value { font-size: 20px; font-weight: bold; text-shadow: none; }
+    .balance-display .balance-value.default-color { color: var(--accent); text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
+    .balance-display .balance-value.deposit-value { color: var(--deposit-color); text-shadow: 0 0 8px rgba(79, 106, 255, 0.5); }
+    .balance-display .balance-value.withdraw-value { color: var(--withdrawal-color); text-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
+
+    /* Countdown Timer */
+    .countdown-box { margin: 30px auto; padding: 20px; text-align: center; max-width: 350px; }
+    .countdown-box p { font-size: 16px; color: var(--accent); margin-bottom: 15px; }
+    .countdown-box .time-value { font-size: 28px; font-weight: bold; color: var(--primary-light); text-shadow: 0 0 10px rgba(79, 106, 255, 0.5); margin: 0 5px; }
+
+    /* Referral Link Section */
+    .referral-link-section { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding: 20px; }
+    .referral-info { display: flex; flex-direction: column; gap: 8px; text-align: left; flex-grow: 1; }
+    .referral-info-item { display: flex; gap: 10px; align-items: baseline; }
+    .referral-info-label { font-size: 14px; color: #a0aec0; width: 110px; flex-shrink: 0; }
+    .referral-info-value { font-size: 18px; font-weight: bold; color: var(--accent); }
+    .referral-info-value#referralEarningsDisplay { color: var(--theme-positive); text-shadow: 0 0 5px rgba(79, 106, 255, 0.5); }
+    .referral-section-btn { width: 100px; height: 100px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 13px; font-weight: normal; text-align: center; padding: 0; border: 2px solid var(--primary); color: var(--accent); background: rgba(79, 106, 255, 0.15); box-shadow: 0 4px 10px rgba(79, 106, 255, 0.3); transition: all 0.3s ease; flex-shrink: 0; text-decoration: none; text-transform: uppercase; }
+    .referral-section-btn:hover { transform: scale(1.05); background: rgba(79, 106, 255, 0.3); color: var(--primary-light); box-shadow: 0 6px 12px rgba(79, 106, 255, 0.5); border-color: var(--primary-light); }
+    .referral-section-btn .button-emoji { font-size: 45px; margin-bottom: 6px; line-height: 1; }
+
+    .transfer-wallet-container { display: flex; justify-content: center; margin: 30px 0; }
+    .transfer-to-wallet-btn { font-size: 16px; width: 250px; text-transform: uppercase; letter-spacing: 1px; }
+    .transfer-to-wallet-btn:hover { opacity: 0.9; }
+
+    footer { text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; }
+    footer p, footer a { font-family: 'Orbitron', sans-serif; }
+    footer a { color: #a0aec0; text-decoration: none; margin: 0 10px; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; backdrop-filter: blur(5px); }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-container { width: 90%; max-width: 550px; background: rgba(20, 30, 50, 0.95); border: 1px solid rgba(79, 106, 255, 0.3); border-radius: 10px; padding: 30px; position: relative; transform: translateY(-20px); transition: transform 0.3s; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 106, 255, 0.5); backdrop-filter: blur(10px); max-height: 90vh; overflow-y: auto; }
+    #historyModal .modal-container, #socialLinksModal .modal-container, #bonusProgramModal .modal-container { max-width: 700px; }
+    #bonusProgramModal .modal-content { padding: 0; }
+
+    .modal-overlay.active .modal-container { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; }
+    .modal-title { font-size: 20px; font-weight: bold; color: var(--accent); text-shadow: 0 0 10px rgba(79, 106, 255, 0.5); }
+    .close-modal { background: transparent; border: none; color: var(--accent); font-size: 24px; cursor: pointer; transition: all 0.2s; }
+    .close-modal:hover { color: var(--primary); transform: scale(1.1); }
+    .modal-content { margin-bottom: 25px; }
+    .modal-content .form-group { margin-bottom: 20px; }
+
+
+    /* Transaction Summary Modal Specific (for Deposits) */
+    .summary-item { display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .summary-item:last-child { border-bottom: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(255, 255, 255, 0.1); }
+    .summary-label { font-size: 14px; color: #a0aec0; }
+    .summary-value { font-weight: bold; color: var(--accent); text-shadow: 0 0 5px rgba(79, 106, 255, 0.2); }
+    .total-row { font-size: 18px; }
+    .total-row .summary-label { color: var(--accent); }
+    /* Ensure this style applies correctly for deposit summary: total USDT to be transferred */
+    #modalSummaryTitle[data-tx-type="deposit"] ~ .modal-content .total-row .summary-value { color: var(--theme-positive); text-shadow: 0 0 8px rgba(79, 106, 255, 0.5); }
+
+    .fee-info { margin: 15px 0; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 5px; font-size: 13px; color: #a0aec0; text-align: center; }
+    .transaction-id { text-align: center; font-size: 12px; color: #a0aec0; margin-bottom: 10px; }
+    .modal-footer { display: flex; justify-content: center; margin-top: 30px; }
+    .go-to-wallet-btn { font-size: 16px; width: 80%; letter-spacing: 1px; position: relative; overflow: hidden; text-transform: uppercase; }
+    .go-to-wallet-btn:after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: 0.5s; }
+    .go-to-wallet-btn:hover:after { left: 100%; }
+    .pulse { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(79, 106, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(79, 106, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(79, 106, 255, 0); } }
+
+    /* QR Code and Wallet Address Display Section (for Deposits) */
+    .qr-wallet-display {
+        display: none;
+        text-align: center;
+        padding: 20px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 20px;
+    }
+    .qr-wallet-display img {
+        width: 180px;
+        height: 180px;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background-color: white;
+    }
+    .qr-wallet-display .wallet-address-display {
+        font-size: 14px;
+        color: var(--accent);
+        margin-bottom: 10px;
+        padding: 8px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 4px;
+        word-break: break-all;
+    }
+    .qr-wallet-display .wallet-address-display strong {
+        color: var(--primary-light);
+    }
+    .qr-wallet-display .copy-address-btn {
+        margin-bottom: 20px;
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    /* Wallet Selection Styles (for Deposits) */
+    .wallet-selection {
+        margin-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 20px;
+    }
+    .wallet-selection-title { text-align: center; margin-bottom: 20px; font-size: 16px; color: var(--accent); letter-spacing: 1px; }
+    .wallet-options { display: flex; justify-content: space-around; gap: 15px; }
+    .wallet-option { display: flex; flex-direction: column; align-items: center; width: 45%; padding: 15px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; transition: all 0.3s ease; }
+    .wallet-option:hover { transform: translateY(-5px); background: rgba(79, 106, 255, 0.1); border-color: var(--primary); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
+    .wallet-logo { width: 60px; height: 60px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+    .wallet-logo svg { width: 100%; height: 100%; }
+    .metamask-logo { filter: drop-shadow(0 0 5px rgba(226, 118, 27, 0.6)); }
+    .trustwallet-logo { filter: drop-shadow(0 0 5px rgba(51, 117, 187, 0.6)); }
+    .icon-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+    /* Loading spinner */
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(79, 106, 255, 0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin: 20px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* History Modal Specific Styles */
+    #historyListContainer { overflow-y: auto; padding-right: 10px; margin-top: 15px; min-height: 100px; }
+    .history-item { display: grid; grid-template-columns: 1fr 1.5fr 1fr 1.5fr; gap: 15px; padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; align-items: center; transition: background-color 0.2s; }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover { background-color: rgba(255, 255, 255, 0.05); }
+    .history-item > div { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-type { font-weight: bold; text-transform: capitalize; }
+    .history-amount { font-weight: bold; }
+    .history-amount.history-amount-positive { color: var(--theme-positive); }
+    .history-amount.history-amount-negative { color: var(--theme-negative); }
+    .history-amount small { color: #a0aec0; font-weight: normal; font-size: 0.9em; display: block; margin-top: 2px;}
+
+    .history-status { font-weight: bold; padding: 3px 8px; border-radius: 4px; text-align: center; font-size: 11px; text-transform: uppercase; display: inline-block; white-space: nowrap; }
+    .history-status small {
+        display: block;
+        font-size: 0.9em;
+        color: #a0aec0;
+        text-transform: none;
+        font-weight: normal;
+        margin-top: 2px;
+        white-space: normal;
+    }
+    .status-success { color: var(--theme-success); background-color: rgba(79, 106, 255, 0.1); border: 1px solid rgba(79, 106, 255, 0.3); }
+    .status-pending { color: var(--status-pending); background-color: rgba(255, 170, 0, 0.1); border: 1px solid rgba(255, 170, 0, 0.3); }
+    .status-failed { color: var(--theme-failed); background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); }
+    .history-date { color: #a0aec0; font-size: 12px; text-align: right; }
+    .history-placeholder { text-align: center; color: #a0aec0; padding: 30px; font-style: italic; font-size: 14px; }
+
+    /* Quick Links */
+    .quick-links-section { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 15px; flex-wrap: wrap; }
+    .quick-links-section .btn { width: 100px; height: 100px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 13px; font-weight: normal; text-align: center; padding: 0; border: 2px solid var(--primary); color: var(--accent); background: rgba(79, 106, 255, 0.15); box-shadow: 0 4px 10px rgba(79, 106, 255, 0.3); transition: all 0.3s ease; flex: 0 0 auto; text-decoration: none; text-transform: uppercase; }
+    .quick-links-section .btn:hover { transform: scale(1.05); background: rgba(79, 106, 255, 0.3); color: var(--primary-light); box-shadow: 0 6px 12px rgba(79, 106, 255, 0.5); border-color: var(--primary-light); }
+    .quick-links-section .btn svg { width: 45px; height: 45px; margin-bottom: 6px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Social Links Modal specific style */
+     #socialLinksModal .modal-content a { color: var(--primary-light); text-decoration: none; transition: color 0.2s; }
+      #socialLinksModal .modal-content a:hover { color: var(--primary); text-decoration: underline; }
+       #socialLinksModal .modal-content .input-label { margin-bottom: 4px; color: #a0aec0; font-size: 13px; }
+
+    /* STYLES FOR BONUS PROGRAM MODAL */
+    #bonusProgramModal .modal-content-wrapper {
+        padding: 15px;
+    }
+    .info-card {
+        background: var(--card-bg-transparent);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .info-card:last-child { margin-bottom: 0; }
+
+    .info-card h2 {
+        font-size: 18px;
+        color: var(--primary);
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(79, 106, 255, 0.3);
+        padding-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .info-card h2 svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        stroke: var(--primary);
+        fill: none;
+    }
+    .info-card h2 svg.icon-user, .info-card h2 svg.icon-investor, .info-card h2 svg.icon-info { stroke-width: 2; }
+
+
+    .info-card h3 {
+        font-size: 16px;
+        color: var(--accent);
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+
+    .highlight-text {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-bottom: 20px;
+        padding: 10px 12px;
+        background-color: rgba(79, 106, 255, 0.1);
+        border-left: 3px solid var(--primary);
+        border-radius: 4px;
+    }
+    .highlight-text strong {
+        font-weight: 700;
+        color: var(--primary-light);
+    }
+
+    .bonus-ladder { margin-top: 10px; }
+    .bonus-ladder .tier {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        margin-bottom: 10px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        border-left: 4px solid var(--secondary);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .bonus-ladder .tier:hover {
+        transform: translateX(4px) scale(1.01);
+        box-shadow: 0 4px 12px rgba(var(--secondary-rgb), 0.25);
+    }
+    .tier .tier-condition { font-size: 13px; color: var(--text-color); }
+    .tier .tier-reward {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--accent);
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        padding: 4px 10px;
+        border-radius: 4px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .investment-tiers {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .investment-tiers th, .investment-tiers td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .investment-tiers th {
+        background-color: rgba(79, 106, 255, 0.15);
+        color: var(--primary-light);
+        font-size: 13px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .investment-tiers td { font-size: 13px; color: var(--text-color); }
+    .investment-tiers td:last-child { font-weight: bold; color: var(--theme-positive); text-align: right; }
+    .investment-tiers tr:last-child td { border-bottom: none; }
+    .investment-tiers tbody tr:hover td { background-color: rgba(255, 255, 255, 0.05); }
+
+    .platform-info-card ul { list-style: none; padding-left: 0; margin-top: 8px; }
+    .platform-info-card ul li {
+        font-size: 13px;
+        padding: 10px 5px;
+        color: var(--text-color);
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+    }
+    .platform-info-card ul li:last-child { border-bottom: none; }
+    .platform-info-card ul li strong { color: var(--accent); margin-left: auto; padding-left: 8px; font-size: 14px; }
+    .platform-info-card ul li svg { width: 16px; height: 16px; stroke: var(--theme-positive); fill: none; margin-right: 10px; flex-shrink: 0; }
+
+    .slogan-banner {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        border-radius: 6px;
+        margin-top: 25px;
+        box-shadow: 0 5px 15px rgba(79, 106, 255, 0.25), 0 -1px 8px rgba(139, 92, 246, 0.15);
+    }
+    .slogan-banner p {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--accent);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .main-content { margin-left: 0; padding: 15px; }
+      .sidebar { width: 250px; }
+      .header { flex-direction: row; padding: 12px; margin-bottom: 15px; align-items: center; justify-content: space-between; }
+      .logo-container { flex-direction: column; align-items: flex-end; }
+      .logo-text { font-size: 18px; text-align: right; line-height: 1.2; }
+      .toggle-sidebar-btn { margin: 0; padding: 8px 10px; font-size: 22px; min-width: 40px; height: 40px; }
+      .notification-popup { width: 95%; right: 2.5%; max-height: 80vh; }
+      .wallet-container { grid-template-columns: 1fr; gap: 10px; }
+      .btn, .transaction-btn { padding: 8px 16px; font-size: 0.9rem; }
+
+      .referral-link-section { flex-direction: column; align-items: center; text-align: center; gap: 15px; padding: 15px; }
+      .referral-info { text-align: center; align-items: center; }
+      .referral-info-label { width: auto; }
+      .referral-section-btn { margin-left: 0; width: 90px; height: 90px; }
+      .referral-section-btn .button-emoji { font-size: 40px; margin-bottom: 4px; }
+
+       .quick-links-section { gap: 10px; padding: 10px; justify-content: space-around; }
+       .quick-links-section .btn { width: 80px; height: 80px; font-size: 11px; border-radius: 8px; }
+       .quick-links-section .btn svg { width: 35px; height: 35px; margin-bottom: 4px; }
+
+        .balance-value { font-size: 18px; }
+        .countdown-box .time-value { font-size: 22px; }
+        .balance-item { padding: 12px; }
+        .balance-display .balance-value { font-size: 18px; }
+        .balance-display .balance-label { font-size: 12px; }
+        .transaction-input { padding: 10px 12px; font-size: 14px; }
+        .input-label { font-size: 12px; margin-bottom: 4px; }
+        .amount-feedback { font-size: 10px; right: 10px; }
+        .transfer-to-wallet-btn { width: 100%; padding: 10px 20px; font-size: 14px; }
+
+         #historyModal .modal-container, #socialLinksModal .modal-container, #bonusProgramModal .modal-container, #withdrawalRequestModal .modal-container { max-width: 95%; padding: 20px; }
+         .history-item { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 5px 10px; padding: 10px; font-size: 12px; }
+         .history-item > div { white-space: normal; }
+         .history-type { grid-column: 1 / 2; grid-row: 1 / 2; font-weight: bold;}
+         .history-amount { grid-column: 2 / 3; grid-row: 1 / 2; text-align: right; font-weight: bold; }
+         .history-status { grid-column: 1 / 2; grid-row: 2 / 3; text-align: left; display: inline-block; margin-top: 3px;}
+         .history-date { grid-column: 2 / 3; grid-row: 2 / 3; text-align: right; font-size: 11px; margin-top: 3px;}
+         .modal-container { max-height: 85vh; }
+
+         #socialLinksModal .modal-content .input-label { font-size: 11px; }
+         #socialLinksModal .modal-content a { font-size: 12px; word-break: break-all; }
+         #socialLinksModal .modal-content > div { margin-bottom: 10px; }
+
+        #bonusProgramModal .info-card { padding: 15px; }
+        #bonusProgramModal .info-card h2 { font-size: 16px; }
+        #bonusProgramModal .info-card h3 { font-size: 14px; }
+        #bonusProgramModal .highlight-text { font-size: 12px; }
+        #bonusProgramModal .bonus-ladder .tier { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px;}
+        #bonusProgramModal .tier .tier-condition { font-size: 12px;}
+        #bonusProgramModal .tier .tier-reward { margin-top: 4px; font-size: 13px; padding: 3px 8px;}
+        #bonusProgramModal .investment-tiers th, #bonusProgramModal .investment-tiers td { font-size: 12px; padding: 8px 8px; }
+        #bonusProgramModal .platform-info-card ul li { font-size: 12px; }
+        #bonusProgramModal .platform-info-card ul li strong { font-size: 13px; }
+        #bonusProgramModal .slogan-banner p { font-size: 14px; }
+
+        .qr-wallet-display img { width: 150px; height: 150px; }
+        .qr-wallet-display .wallet-address-display { font-size: 13px; }
+        .qr-wallet-display .copy-address-btn { font-size: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar { width: 220px; }
+      .logo-text { font-size: 16px; }
+      .toggle-sidebar-btn { min-width: 36px; height: 36px; font-size: 20px; }
+      .btn, .transaction-btn { padding: 8px 14px; font-size: 0.8rem; }
+
+      .referral-section-btn { width: 75px; height: 75px; }
+      .referral-section-btn .button-emoji { font-size: 35px; margin-bottom: 2px; }
+
+      .quick-links-section { gap: 8px; padding: 8px; justify-content: space-around; }
+       .quick-links-section .btn { width: 65px; height: 65px; font-size: 10px; }
+       .quick-links-section .btn svg { width: 28px; height: 28px; margin-bottom: 2px; }
+
+        .countdown-box .time-value { font-size: 18px; }
+        .countdown-box p { font-size: 14px; }
+        .balance-display .balance-value { font-size: 16px; }
+        .balance-display .balance-label { font-size: 11px; }
+
+         .history-item { font-size: 10px; padding: 7px; }
+         .history-date { font-size: 9px; }
+         .history-status { font-size: 9px; padding: 1px 4px; }
+         .history-status small { font-size: 0.9em; }
+         .history-amount small { font-size: 0.9em; }
+         .modal-header { padding: 10px 15px; }
+         .modal-title { font-size: 18px; }
+         .close-modal { font-size: 20px; }
+
+
+         #socialLinksModal .modal-container { padding: 15px; }
+         #socialLinksModal .modal-content a { font-size: 11px; }
+         #socialLinksModal .modal-content > div { margin-bottom: 8px; }
+         #socialLinksModal .modal-footer .btn { width: 120px; font-size: 12px; }
+
+        #bonusProgramModal .info-card { padding: 10px; margin-bottom: 15px;}
+        #bonusProgramModal .info-card h2 { font-size: 14px; margin-bottom: 10px;}
+        #bonusProgramModal .info-card h2 svg { width: 16px; height: 16px; margin-right: 6px;}
+        #bonusProgramModal .info-card h3 { font-size: 12px; margin-bottom: 8px;}
+        #bonusProgramModal .highlight-text { font-size: 11px; padding: 8px;}
+        #bonusProgramModal .tier .tier-condition, #bonusProgramModal .tier .tier-reward { font-size: 11px; }
+        #bonusProgramModal .tier .tier-reward { padding: 2px 6px;}
+        #bonusProgramModal .investment-tiers { display: block; width: 100%; overflow-x: auto; }
+        #bonusProgramModal .investment-tiers th { font-size: 10px; padding: 6px;}
+        #bonusProgramModal .investment-tiers td { font-size: 11px; padding: 6px; }
+        #bonusProgramModal .platform-info-card ul li { font-size: 11px; padding: 8px 0;}
+        #bonusProgramModal .platform-info-card ul li strong { font-size: 12px; }
+        #bonusProgramModal .platform-info-card ul li svg { width: 14px; height: 14px; margin-right: 6px;}
+        #bonusProgramModal .slogan-banner { padding: 10px; margin-top: 20px;}
+        #bonusProgramModal .slogan-banner p { font-size: 12px; letter-spacing: 0.5px; }
+
+        .qr-wallet-display img { width: 120px; height: 120px; }
+        .qr-wallet-display .wallet-address-display { font-size: 12px; }
+    }
+
+</style>
+</head>
+<body>
+<div class="stars-container" id="starsContainer"></div>
+
+<div class="sidebar" id="sidebar">
+<button class="close-sidebar" onclick="toggleSidebar()">×</button>
+<h2>Menu</h2>
+<a class="active" href="#" onclick="setActiveMenu(this); return false;">
+<span class="menu-icon">
+<svg class="icon-home" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+</span>
+  Home
+</a>
+<a href="Profile.html" onclick="setActiveMenu(this);">
+<span class="menu-icon">
+<svg class="icon-user" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+</span>
+  Profile
+</a>
+<a href="#" onclick="setActiveMenu(this); openModal('resetPasswordModal'); return false;">
+<span class="menu-icon">
+<svg class="icon-key" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+</span>
+  Reset Password
+</a>
+<a href="Referrals.html" onclick="setActiveMenu(this);">
+<span class="menu-icon">
+<svg class="icon-chain" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+</span>
+  Referrals
+</a>
+<a id="logoutButton" href="#" onclick="handleLogout(); return false;">
+<span class="menu-icon">
+<svg class="icon-logout" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
+</span>
+  Logout
+</a>
+</div>
+
+<div class="main-content" id="mainContent">
+<div class="header">
+<button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+<div class="logo-container">
+<div class="logo-text">MINIXVERSE</div>
+</div>
+<div class="notification-icon-container" id="notificationIconContainer" onclick="toggleNotifications()">
+<div class="notification-icon">
+<svg class="icon-bell" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+</div>
+<div class="notification-badge" id="notificationBadge">0</div>
+</div>
+</div>
+
+<div class="notification-overlay" id="notificationOverlay">
+    <div class="notification-popup" id="notificationPopup">
+    <div class="notification-header">
+    <div class="notification-title">Notifications</div>
+    <div class="notification-actions">
+    <button class="mark-all-read-btn">Mark all as read</button>
+    <button class="close-notifications" onclick="toggleNotifications()">×</button>
+    </div>
+    </div>
+    <div class="notification-content" id="alertsList">
+      <div style="text-align: center; color: #a0aec0; padding: 20px;">No notifications yet.</div>
+    </div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+<div class="dashboard-main">
+<div class="welcome-section">
+<h1></h1>
+</div>
+
+<div class="wallet-container">
+    <div class="wallet-box">
+        <div class="wallet-title">MXV Balance</div>
+        <div class="wallet-amount" id="mxvBalanceValue">0.0000 MXV</div>
+    </div>
+    <div class="wallet-box">
+        <div class="wallet-title">Transferrable balance</div>
+        <div class="wallet-amount" id="transferrableBalanceValue">0.0000 MXV</div>
+    </div>
+    <div class="wallet-box">
+        <div class="wallet-title">Daily Rewards</div>
+        <div class="wallet-amount" id="dailyRewardsValue">0.0000 MXV</div>
+    </div>
+    <div class="wallet-box">
+        <div class="wallet-title">MXV Pricing</div>
+        <div class="wallet-amount" id="usdtPriceValue">1.20 USDT</div> </div>
+</div>
+
+<div class="countdown-box">
+    <p>Next Reward Distribution In:</p>
+    <div id="rewardsCountdown"><span class="time-value">00</span>:<span class="time-value">00</span>:<span class="time-value">00</span></div>
+</div>
+
+<div class="referral-link-section">
+    <div class="referral-info">
+        <div class="referral-info-item">
+            <span class="referral-info-label">Total Referrals:</span>
+            <span class="referral-info-value" id="referralCountDisplay">0</span>
+        </div>
+        <div class="referral-info-item">
+            <span class="referral-info-label">Total Earnings:</span>
+            <span class="referral-info-value" id="referralEarningsDisplay">0.00 MXV</span>
+        </div>
+    </div>
+    <a href="#" class="referral-section-btn" onclick="openReferralsModal(); return false;" title="View Referrals">
+         <span class="button-emoji">🔗</span>
+         Referrals
+    </a>
+</div>
+
+<div class="summary-box">
+    <div class="summary-title">MXV Token Actions</div>
+    <div class="transaction-container">
+        <div class="input-wrapper unified-wrapper">
+             <label for="transactionType" class="input-label" id="actionTypeLabel">Action Type:</label>
+             <select class="transaction-input" id="transactionType">
+                <option value="deposit">Deposit (Get MXV)</option>
+                <option value="withdraw">Withdraw (MXV)</option>
+            </select>
+        </div>
+        <div class="input-wrapper unified-wrapper">
+            <label for="unifiedInput" class="input-label" id="amountLabel">Enter Amount:</label>
+            <div style="position: relative; width: 100%;">
+                <input class="transaction-input" id="unifiedInput" placeholder="Enter MXV amount" type="number" step="0.0001" min="0"/>
+                <span class="amount-feedback" id="unifiedFeedback"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="balance-display" id="transactionSummary">
+        <div class="balance-item">
+            <div class="balance-label">Current MXV Balance</div>
+            <div class="balance-value default-color" id="currentBalanceDisplay">0.0000</div>
+        </div>
+        <div class="balance-item" id="summaryDepositRow">
+             <div class="balance-label" id="mainDepositAmountLabel">MXV to Receive:</div>
+            <div class="balance-value default-color" id="depositAmountDisplay">0.0000</div>
+        </div>
+        <div class="balance-item" id="summaryWithdrawGrossRow" style="display: none;">
+             <div class="balance-label" id="mainWithdrawAmountLabel">MXV to Withdraw (Gross):</div>
+            <div class="balance-value default-color" id="withdrawAmountDisplay">0.0000</div>
+        </div>
+        <div class="balance-item" id="summaryWithdrawFeeRow" style="display: none;">
+            <div class="balance-label">Network Fee (5%):</div>
+            <div class="balance-value withdraw-value" id="withdrawFeeDisplay">0.0000</div>
+        </div>
+        <div class="balance-item" id="summaryWithdrawNetRow" style="display: none;">
+            <div class="balance-label">Net MXV You Will Receive:</div>
+            <div class="balance-value withdraw-value" id="withdrawNetDisplay">0.0000</div>
+        </div>
+        <div class="balance-item">
+            <div class="balance-label">Projected Balance Change (MXV)</div>
+            <div class="balance-value" id="projectedBalance">0.0000</div>
+        </div>
+    </div>
+
+    <div class="transfer-wallet-container">
+        <button class="transfer-to-wallet-btn btn" id="transferToWalletBtn">Initiate Transaction</button>
+    </div>
+</div>
+
+<div class="quick-links-section">
+    <a class="btn" href="#" onclick="openModal('profileModal'); return false;" title="Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        Profile
+    </a>
+     <a class="btn" href="#" onclick="openHistoryModal(); return false;" title="History">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        History
+    </a>
+    <a class="btn" href="#" onclick="openModal('bonusProgramModal'); return false;" title="Bonus Program">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="45" height="45"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="currentColor"/></svg>
+        Bonus
+    </a>
+     <a class="btn" href="#" onclick="alert('Support feature coming soon!'); return false;" title="Support">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        Support
+    </a>
+    </div>
+
+</div>
+</div>
+
+
+<footer>
+<p>© 2025 MINIXVERSE. All rights reserved.</p>
+<p style="font-size: 0.8rem; margin-top: 10px; color: #a0aec0;">
+<a href="#">Privacy Policy</a> |
+        <a href="#">Terms of Service</a> |
+        <a href="#">Legal</a>
+</p>
+</footer>
+</div> <div class="modal-overlay" id="orderSummaryModal">
+<div class="modal-container">
+<div class="modal-header">
+<div class="modal-title" id="modalSummaryTitle" data-tx-type="">DEPOSIT SUMMARY</div>
+<button class="close-modal" onclick="closeModal('orderSummaryModal')">×</button>
+</div>
+<div class="modal-content">
+<div class="transaction-id">Transaction ID: <span id="transactionId"></span></div>
+<div class="summary-item">
+<div class="summary-label" id="modalAmountLabel">Amount</div>
+<div class="summary-value" id="txAmountEntered">0</div>
+</div>
+<div class="summary-item">
+<div class="summary-label">Conversion Rate</div>
+<div class="summary-value" id="depositConversionRate">1 MXV = 1.20 USDT</div> </div>
+<div class="summary-item">
+<div class="summary-label" id="modalFeeLabel">Network Fee</div>
+<div class="summary-value" id="txFeeAmount">0.00 USDT</div>
+</div>
+<div class="fee-info" id="modalFeeInfo">
+          Fee information will be displayed here.
+        </div>
+<div class="summary-item total-row">
+<div class="summary-label" id="modalTotalLabel">Total</div>
+<div class="summary-value" id="txTotalEffective">0 USDT</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="go-to-wallet-btn pulse btn" id="goToWalletBtn">CONFIRM & PROCEED</button>
+</div>
+
+<div class="qr-wallet-display" id="qrWalletDisplay">
+    <p style="font-size: 16px; color: var(--primary-light); margin-bottom: 15px;">Scan QR or use address below to deposit USDT (BEP20/ERC20)</p>
+    <img id="depositQrCode" src="https://placehold.co/200x200/FFFFFF/000000?text=QR+Code" alt="Deposit QR Code"/>
+    <div class="wallet-address-display">
+        <strong>Wallet Address:</strong> <span id="depositWalletAddress">OxE239168dF3BaF34bE64</span>
+    </div>
+    <button class="btn copy-address-btn" id="copyAddressBtn">Copy Address</button>
+</div>
+
+
+<div class="wallet-selection" id="walletSelection" style="display: none;">
+<div class="wallet-selection-title">THEN, SELECT YOUR WALLET TO INITIATE THE TRANSFER</div>
+<div class="wallet-options">
+<div class="wallet-option" id="metamaskOption">
+<div class="wallet-logo metamask-logo">
+<svg fill="none" viewbox="0 0 35 33" xmlns="http://www.w3.org/2000/svg"><path d="M32.9582 1L19.8241 10.7183L22.2812 5.09824L32.9582 1Z" fill="#E2761B" stroke="#E2761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.04183 1L15.0812 10.8041L12.7188 5.09824L2.04183 1Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M28.226 23.5283L24.7031 28.8721L32.1868 30.9049L34.3295 23.6497L28.226 23.5283Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M0.685913 23.6497L2.81321 30.9049L10.2968 28.8721L6.77394 23.5283L0.685913 23.6497Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.89098 14.5963L7.7483 17.6853L15.1606 18.0136L14.9178 10.0681L9.89098 14.5963Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M25.109 14.5963L20.0107 10.0681L19.8394 18.0136L27.2517 17.6853L25.109 14.5963Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M10.2969 28.8721L14.674 26.7177L10.9112 23.6853L10.2969 28.8721Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.3259 26.7177L24.7031 28.8721L24.0887 23.6853L20.3259 26.7177Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div class="wallet-name">MetaMask</div>
+</div>
+<div class="wallet-option" id="trustWalletOption">
+<div class="wallet-logo trustwallet-logo">
+<svg fill="none" viewbox="0 0 35 35" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 2C8.94 2 2 8.94 2 17.5C2 26.06 8.94 33 17.5 33C26.06 33 33 26.06 33 17.5C33 8.94 26.06 2 17.5 2Z" fill="#3375BB"></path><path d="M17.5 8.75L12.1667 14.0833V20.9167L17.5 26.25L22.8333 20.9167V14.0833L17.5 8.75Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12.1667 14.0833L17.5 17.5" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M17.5 17.5L22.8333 14.0833" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M17.5 17.5V26.25" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="wallet-name">Trust Wallet</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="withdrawalRequestModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title">WITHDRAWAL REQUEST</div>
+            <button class="close-modal" onclick="closeModal('withdrawalRequestModal')">×</button>
+        </div>
+        <div class="modal-content">
+            <div class="form-group">
+                <label for="withdrawalAmountMXV" class="input-label">Withdrawal Amount (MXV):</label>
+                <input type="number" id="withdrawalAmountMXV" class="transaction-input" placeholder="Enter MXV amount" step="0.0001" min="0">
+            </div>
+            <div class="form-group">
+                <label for="withdrawalWalletAddress" class="input-label">Your Wallet Address (MXV):</label>
+                <input type="text" id="withdrawalWalletAddress" class="transaction-input" placeholder="Enter your receiving wallet address">
+            </div>
+            <div class="form-group">
+                <label for="withdrawalEmail" class="input-label">Your Email ID:</label>
+                <input type="email" id="withdrawalEmail" class="transaction-input" placeholder="Enter your email for confirmation">
+            </div>
+            <div class="fee-info" id="withdrawalFeeInfo" style="margin-top: 15px;">
+                A network fee of 5% will be applied.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn transaction-btn" id="confirmWithdrawalBtn" style="width: 80%;">Confirm & Proceed Withdrawal</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="resetPasswordModal">
+<div class="modal-container">
+<div class="modal-header">
+<div class="modal-title">RESET PASSWORD</div>
+<button class="close-modal" onclick="closeModal('resetPasswordModal')">×</button>
+</div>
+<div class="modal-content">
+<div class="form-group">
+<label class="input-label">Current Password</label>
+<input class="transaction-input" id="currentPassword" placeholder="Enter current password" style="width: 100%;" type="password"/>
+</div>
+<div class="form-group">
+<label class="input-label">New Password</label>
+<input class="transaction-input" id="newPassword" placeholder="Enter new password" style="width: 100%;" type="password"/>
+</div>
+<div class="form-group">
+<label class="input-label">Confirm New Password</label>
+<input class="transaction-input" id="confirmPassword" placeholder="Confirm new password" style="width: 100%;" type="password"/>
+</div>
+</div>
+<div class="modal-footer" style="margin-top: 30px; display: flex; justify-content: space-between; gap: 15px;">
+<button class="transaction-btn btn" id="cancelResetBtn" style="background: rgba(255, 255, 255, 0.1); color: var(--text-color); flex-basis: 45%;">Cancel</button>
+<button class="transaction-btn btn" id="resetPasswordBtn" style="flex-basis: 45%;">Reset Password</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="referralsModal">
+<div class="modal-container">
+<div class="modal-header">
+<div class="modal-title">REFERRAL PROGRAM</div>
+<button class="close-modal" onclick="closeModal('referralsModal')">×</button>
+</div>
+<div class="modal-content">
+<div style="text-align: center; margin-bottom: 20px;">
+<div style="font-size: 16px; color: var(--accent); margin-bottom: 10px;">Your Referral Link</div>
+<div style="display: flex; margin-bottom: 15px;">
+<input class="transaction-input" id="referralLink" readonly style="flex: 1; margin-right: 10px; background-color: rgba(255,255,255,0.1);" type="text" value="Generating..."/>
+<button class="transaction-btn btn" id="copyReferralBtn" style="white-space: nowrap;">Copy</button>
+</div>
+<div id="copyMessage" style="font-size: 12px; color: var(--theme-positive); visibility: hidden; height: 15px;"></div>
+</div>
+<div style="margin-top: 30px;">
+<div style="font-size: 16px; color: var(--accent); margin-bottom: 15px; text-align: center;">Your Referrals</div>
+<div id="referralListContainer" style="background: rgba(20, 30, 50, 0.5); border-radius: 8px; padding: 15px; max-height: 200px; overflow-y: auto; min-height: 60px;">
+    <div class="history-placeholder">Loading referral data...</div>
+</div>
+</div>
+<div style="margin-top: 20px; text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+<div style="font-size: 14px; color: var(--accent); margin-bottom: 5px;">Total Referral Earnings</div>
+<div style="font-size: 20px; font-weight: bold; color: var(--theme-positive);" id="totalReferralEarnings">0.00 MXV</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title">PROFILE SETTINGS</div>
+            <button class="close-modal" onclick="closeModal('profileModal')">×</button>
+        </div>
+        <div class="modal-content">
+            <p style="text-align: center; color: #a0aec0; padding: 20px 0;">Profile management features are under development.</p>
+             <div class="form-group">
+                <label class="input-label">Username</label>
+                <input class="transaction-input" id="profileUsername" placeholder="Your username" style="width: 100%; background-color: rgba(255,255,255,0.05);" type="text" value="DemoUser" readonly />
+            </div>
+             <div class="form-group">
+                <label class="input-label">Email</label>
+                <input class="transaction-input" id="profileEmail" placeholder="Your email" style="width: 100%; background-color: rgba(255,255,255,0.05);" type="email" value="demo@example.com" readonly />
+            </div>
+             <div style="text-align: center; margin-top: 30px;">
+                 <button class="transaction-btn btn" onclick="closeModal('profileModal'); openModal('resetPasswordModal');">Change Password</button>
+             </div>
+        </div>
+         <div class="modal-footer">
+             <button class="transaction-btn btn" onclick="closeModal('profileModal')" style="width: 150px; background: rgba(255,255,255,0.1); color: var(--text-color);">Close</button>
+         </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title">TRANSACTION HISTORY</div>
+            <button class="close-modal" onclick="closeModal('historyModal')">×</button>
+        </div>
+        <div class="modal-content">
+            <div id="historyListContainer">
+                 <div class="history-placeholder">Loading history...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+             <button class="transaction-btn btn" onclick="closeModal('historyModal')" style="width: 150px; background: rgba(255,255,255,0.1); color: var(--text-color);">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="socialLinksModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title">OFFICIAL SOCIAL MEDIA LINKS</div>
+            <button class="close-modal" onclick="closeModal('socialLinksModal')">×</button>
+        </div>
+        <div class="modal-content">
+            <div style="margin-bottom: 15px;">
+                <div class="input-label">Telegram Group:</div>
+                <p><a href="https://t.me/minixverse_community" target="_blank">https://t.me/minixverse_community</a></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <div class="input-label">Telegram Channel:</div>
+                <p><a href="https://t.me/minixverse_announcements" target="_blank">https://t.me/minixverse_announcements</a></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <div class="input-label">Twitter:</div>
+                <p><a href="https://twitter.com/minixverse" target="_blank">https://twitter.com/minixverse</a></p>
+            </div>
+            <div style="margin-bottom: 0;">
+                <div class="input-label">Official Website:</div>
+                <p><a href="https://minixverse.com" target="_blank">https://minixverse.com</a></p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="transaction-btn btn" onclick="closeModal('socialLinksModal')" style="width: 150px; background: rgba(255,255,255,0.1); color: var(--text-color);">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="bonusProgramModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title">REFERRAL & INVESTMENT LADDER</div>
+            <button class="close-modal" onclick="closeModal('bonusProgramModal')">×</button>
+        </div>
+        <div class="modal-content">
+            <div class="bonus-program-modal-content-wrapper">
+                <div class="info-card referrer-card">
+                    <h2>
+                        <svg class="icon-user" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        For Referrers & Agents
+                    </h2>
+                    <p class="highlight-text">Referral Commission: <strong>5% on new member's investment amount</strong></p>
+                    <h3>Referral Bonus Ladder:</h3>
+                    <div class="bonus-ladder">
+                        <div class="tier">
+                            <span class="tier-condition">After 11 Active Members</span>
+                            <span class="tier-reward">100 USD Bonus</span>
+                        </div>
+                        <div class="tier">
+                            <span class="tier-condition">After 21 Active Members</span>
+                            <span class="tier-reward">250 USD Bonus</span>
+                        </div>
+                        <div class="tier">
+                            <span class="tier-condition">After 51 Active Members</span>
+                            <span class="tier-reward">700 USD Bonus</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-card investor-card">
+                    <h2>
+                        <svg class="icon-investor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        For Investors
+                    </h2>
+                    <h3>Monthly Returns on Investment:</h3>
+                    <table class="investment-tiers">
+                        <thead>
+                            <tr>
+                                <th>Investment Range (USD)</th>
+                                <th>Monthly Return</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td data-label="Range: ">$100 - $1000</td><td data-label="Return: ">6% p.m.</td></tr>
+                            <tr><td data-label="Range: ">$1001 - $5000</td><td data-label="Return: ">7% p.m.</td></tr>
+                            <tr><td data-label="Range: ">$5001 - $10,000</td><td data-label="Return: ">8% p.m.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-card platform-info-card">
+                    <h2>
+                         <svg class="icon-info" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Platform Guidelines
+                    </h2>
+                     <ul>
+                        <li>
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Minimum Investment for Program Benefits: <strong>$110 USD</strong>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Platform Minimum Withdrawal Amount: <strong>$20 USD</strong>
+                        </li>
+                    </ul>
+                </div>
+                <div class="slogan-banner">
+                    <p>START TODAY — EARN MONTHLY & GROW WITH YOUR NETWORK!</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="transaction-btn btn" onclick="closeModal('bonusProgramModal')" style="width: 150px; background: rgba(255,255,255,0.1); color: var(--text-color);">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- Constants & Global State ---
+    const PENDING_DEPOSITS_KEY = 'minixverse_pendingDeposits_v2'; // Kept for reward logic, not direct deposit processing
+    const PENDING_WITHDRAWALS_KEY = 'minixverse_pendingWithdrawals_v1';
+    const BALANCES_KEY = 'minixverse_balances_v2';
+    const HISTORY_KEY = 'minixverse_transactionHistory_v2';
+    const REFERRAL_DATA_KEY = 'minixverse_referralData_v1';
+    const CHECK_INTERVAL_MS = 30000; // For checking matured old-style deposits (rewards)
+    const MATURATION_HOURS = 24; // For rewards from older "pending deposits" (old system)
+    const DAILY_REWARD_RATE = 0.0005; // For rewards from older "pending deposits" (old system)
+    const NETWORK_FEE_RATE = 0.05; // For withdrawals (5%)
+    const MXV_USDT_RATE = 1.20; // 1 MXV = 1.20 USDT.
+    const DEPOSIT_WALLET_ADDRESS = "OxE239168dF3BaF34bE64"; // Platform's deposit address
+
+    let countdownInterval;
+    let nextMidnightTarget; // Stores the timestamp for the next midnight
+
+    // --- Local Storage Helpers ---
+    function getLocalStorageItem(key, defaultValue) {
+        try {
+            const item = localStorage.getItem(key);
+            return (item === null || item === 'undefined') ? defaultValue : JSON.parse(item);
+        } catch (e) { console.error(`Error getting LS item ${key}:`, e); return defaultValue; }
+    }
+    function setLocalStorageItem(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); }
+        catch (e) { console.error(`Error setting LS item ${key}:`, e); }
+    }
+
+    // --- Data Management ---
+    function getBalances() { return getLocalStorageItem(BALANCES_KEY, { mxv: 0, transferrable: 0, rewards: 0 }); }
+    function saveBalances(b) { setLocalStorageItem(BALANCES_KEY, b); }
+    function getPendingDeposits() { return getLocalStorageItem(PENDING_DEPOSITS_KEY, []); }
+    function savePendingDeposits(d) { setLocalStorageItem(PENDING_DEPOSITS_KEY, d); }
+    function getPendingWithdrawals() { return getLocalStorageItem(PENDING_WITHDRAWALS_KEY, []); }
+    function savePendingWithdrawals(w) { setLocalStorageItem(PENDING_WITHDRAWALS_KEY, w); }
+    function getTransactionHistory() { return getLocalStorageItem(HISTORY_KEY, []); }
+    function saveTransactionHistory(h) { setLocalStorageItem(HISTORY_KEY, h); }
+    function addTransactionToHistory(t) {
+        const h = getTransactionHistory();
+        if (!h.some(tx => tx.id === t.id)) {
+             h.unshift(t);
+             if (h.length > 100) h.length = 100; // Limit history size
+             saveTransactionHistory(h);
+        } else { console.warn(`Transaction ID ${t.id} already in history.`); }
+    }
+    function updateHistoryStatus(txId, newStatus) {
+        const history = getTransactionHistory();
+        const tx = history.find(t => t.id === txId);
+        if (tx) { tx.status = newStatus; saveTransactionHistory(history); }
+        else { console.warn(`History item ID ${txId} not found for status update.`); }
+    }
+    function getReferralStats() { return getLocalStorageItem(REFERRAL_DATA_KEY, { count: 0, totalEarnings: 0 }); }
+    function saveReferralStats(stats) { setLocalStorageItem(REFERRAL_DATA_KEY, stats); }
+
+    // --- Utility Functions ---
+    function formatTimestamp(ts) {
+        if (!ts || isNaN(ts)) return 'Invalid Date';
+        try { return new Date(ts).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }); }
+        catch (e) { console.error('Error formatting timestamp:', e); return 'Invalid Date'; }
+    }
+    function generateTransactionId() { return `TX${Math.random().toString(16).substring(2, 10).toUpperCase()}`; }
+    function generateReferralLink() {
+        const userId = localStorage.getItem('userName')?.replace(/\s+/g, '') || 'user123';
+        return `${window.location.origin}/?ref=${userId}-${Math.random().toString(36).substring(2, 8)}`;
+    }
+
+    // --- UI Update Functions ---
+    function updateBodyModalClass() {
+        const sidebar = document.getElementById('sidebar');
+        const isMobile = window.innerWidth <= 768;
+        const sidebarVisible = isMobile ? sidebar?.classList.contains('mobile-visible') : !sidebar?.classList.contains('hidden');
+        const anyModalActive = document.querySelector('.modal-overlay.active') !== null;
+        document.body.classList.toggle('modal-open', anyModalActive || (isMobile && sidebarVisible));
+    }
+
+    function addDynamicNotification(title, message, type = 'info') {
+        const list = document.getElementById('alertsList'), badge = document.getElementById('notificationBadge');
+        if (!list || !badge) return;
+        const ph = list.querySelector('.history-placeholder, div[style*="text-align: center"]');
+        if (ph) ph.remove();
+        let icon = 'i', cls = 'info-icon';
+        if (type === 'success') { icon = '✓'; cls = 'success-icon'; }
+        if (type === 'warning') { icon = '!'; cls = 'warning-icon'; }
+        if (type === 'error') { icon = '✕'; cls = 'error-icon'; }
+        const item = document.createElement('div');
+        item.className = `alert-item alert-${type}`;
+        item.innerHTML = `<div class="alert-icon"><div class="icon-circle ${cls}">${icon}</div></div><div class="alert-content"><div class="alert-title">${title}</div><div class="alert-message">${message}</div><div class="alert-time">Just now</div></div><div class="alert-dismiss">×</div>`;
+        list.prepend(item);
+        updateNotificationBadge();
+        item.querySelector('.alert-dismiss').addEventListener('click', () => dismissNotification(item));
+        const iconEl = document.querySelector('.notification-icon');
+        if (iconEl) { iconEl.classList.add('pulse'); setTimeout(() => iconEl.classList.remove('pulse'), 1500); }
+    }
+    function dismissNotification(itemElement) {
+        if (!itemElement) return;
+        itemElement.style.opacity = "0"; itemElement.style.transform = "translateX(30px)";
+        setTimeout(() => {
+            itemElement.remove(); updateNotificationBadge();
+            const list = document.getElementById('alertsList');
+            if (list && list.children.length === 0) {
+                 list.innerHTML = '<div style="text-align: center; color: #a0aec0; padding: 20px;">No notifications yet.</div>';
+                 const badge = document.getElementById('notificationBadge'); if(badge) badge.style.display = 'none';
+            }
+        }, 300);
+    }
+    function updateNotificationBadge(count) {
+        const b = document.getElementById('notificationBadge'); if (!b) return;
+        let c = (count !== undefined) ? count : document.querySelectorAll('#alertsList .alert-item:not(.alert-read)').length;
+        b.textContent = c; b.style.display = c <= 0 ? 'none' : 'flex';
+    }
+    function markAllNotificationsAsRead() {
+        document.querySelectorAll('#alertsList .alert-item:not(.alert-read)').forEach(item => item.classList.add('alert-read'));
+        updateNotificationBadge(0);
+    }
+    function toggleNotifications() {
+        const p = document.getElementById('notificationPopup'), o = document.getElementById('notificationOverlay');
+        if (!p || !o) return;
+        const isActive = p.classList.toggle('active');
+        o.classList.toggle('active', isActive); updateBodyModalClass();
+    }
+
+    // --- Modal Management ---
+    function openModal(id) {
+        const m = document.getElementById(id);
+        if (m) {
+            m.classList.add('active'); updateBodyModalClass();
+            if (id === 'resetPasswordModal') document.getElementById('currentPassword')?.focus();
+            if (id === 'withdrawalRequestModal') {
+                document.getElementById('withdrawalAmountMXV').value = '';
+                document.getElementById('withdrawalWalletAddress').value = '';
+                document.getElementById('withdrawalEmail').value = '';
+                document.getElementById('withdrawalAmountMXV').focus();
+                const feeInfoEl = document.getElementById('withdrawalFeeInfo');
+                if(feeInfoEl) feeInfoEl.textContent = `A network fee of ${(NETWORK_FEE_RATE * 100).toFixed(0)}% will be applied.`;
+            }
+        }
+        else { console.error(`Modal ${id} not found.`); }
+    }
+    function closeModal(id) {
+        const m = document.getElementById(id);
+        if (m) {
+            m.classList.remove('active');
+            if (id === 'orderSummaryModal') { // For Deposit Modal
+                 delete m.dataset.txType; delete m.dataset.txAmountEntered;
+                 delete m.dataset.txTotalEffective;
+                 delete m.dataset.txId;
+                 document.getElementById('qrWalletDisplay').style.display = 'none';
+                 document.getElementById('walletSelection').style.display = 'none';
+                 document.getElementById('goToWalletBtn').style.display = 'block';
+            }
+            if (id === 'withdrawalRequestModal') { // For Withdrawal Modal
+                document.getElementById('withdrawalAmountMXV').value = '';
+                document.getElementById('withdrawalWalletAddress').value = '';
+                document.getElementById('withdrawalEmail').value = '';
+            }
+            updateBodyModalClass();
+        }
+    }
+
+    function openHistoryModal() { openModal('historyModal'); fetchAndDisplayHistory(); }
+    function openReferralsModal() { openModal('referralsModal'); fetchReferralData(); }
+
+
+    // --- Core Application Logic ---
+    function checkAuth() {
+        if (window.location.hostname === 'localhost' || document.domain.includes('sandbox') || document.domain.includes('chatclaude')) {
+            if (!localStorage.getItem(BALANCES_KEY)) saveBalances({ mxv: 0, transferrable: 0, rewards: 0 });
+            localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('userName', 'Demo User'); localStorage.setItem('userEmail', 'demo@example.com');
+            return true;
+        }
+        try {
+            if (localStorage.getItem('isLoggedIn') !== 'true') { return false; }
+            if (!localStorage.getItem(BALANCES_KEY)) saveBalances({ mxv: 0, transferrable: 0, rewards: 0 });
+            return true;
+        } catch (e) { console.error('Auth check LS error:', e); return false; }
+    }
+    function setActiveMenu(el) {
+        document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+        if (el) el.classList.add('active');
+    }
+    function toggleSidebar() {
+        const s = document.getElementById('sidebar'), m = document.getElementById('mainContent'); if (!s || !m) return;
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            const wasVisible = s.classList.contains('mobile-visible');
+            s.classList.toggle('mobile-hidden', wasVisible); s.classList.toggle('mobile-visible', !wasVisible);
+            m.classList.toggle('sidebar-collapsed', wasVisible);
+        } else {
+            const wasHidden = s.classList.toggle('hidden'); m.classList.toggle('sidebar-collapsed', wasHidden);
+            s.classList.remove('mobile-hidden', 'mobile-visible');
+            m.classList.remove('sidebar-collapsed');
+            if (s.classList.contains('hidden')) { m.classList.add('sidebar-collapsed'); }
+        }
+        updateBodyModalClass();
+    }
+    function setInitialMobileState() {
+        const s = document.getElementById('sidebar'), m = document.getElementById('mainContent'); if (!s || !m) return;
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            s.classList.add('mobile-hidden'); s.classList.remove('mobile-visible', 'hidden');
+            m.classList.add('sidebar-collapsed');
+        } else {
+            s.classList.remove('mobile-hidden', 'mobile-visible');
+            if (s.classList.contains('hidden')) m.classList.add('sidebar-collapsed');
+            else m.classList.remove('sidebar-collapsed');
+        }
+        updateBodyModalClass();
+    }
+    function createStars() {
+        const sc = document.getElementById('starsContainer'); if (!sc) return; sc.innerHTML = '';
+        const cnt = Math.floor(window.innerWidth / 15);
+        for (let i = 0; i < cnt; i++) {
+            const s = document.createElement('div'), x = Math.random() * 100, y = Math.random() * 100, t = Math.random();
+            if (t > 0.85) s.className = 'star large'; else if (t > 0.6) s.className = 'star medium'; else s.className = 'star';
+            const d = Math.random() * 7 + 3, del = Math.random() * 10;
+            s.style.left = `${x}%`; s.style.top = `${y}%`; s.style.animationDuration = `${d}s`; s.style.animationDelay = `${del}s`;
+            sc.appendChild(s);
+        }
+    }
+
+    function setNextMidnightTarget() {
+        const now = new Date();
+        nextMidnightTarget = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0); // Next day at 00:00:00
+    }
+
+    function startCountdown() {
+        const el = document.getElementById('rewardsCountdown');
+        if (!el) {
+            console.error("rewardsCountdown element not found");
+            return;
+        }
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        setNextMidnightTarget(); // Set the initial target
+
+        function updateCountdownDisplay() {
+            const now = Date.now();
+            let diff = nextMidnightTarget.getTime() - now;
+
+            if (diff <= 0) {
+                console.log("Midnight reached. Processing rewards...");
+                checkMaturedDeposits(); // This function handles actual reward logic based on its own rules
+                addDynamicNotification("Daily Update", "Daily reward cycle complete. New countdown started.", "info");
+                setNextMidnightTarget(); // Set target for the *next* midnight
+                diff = nextMidnightTarget.getTime() - now; // Recalculate diff for the new target
+            }
+
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            el.innerHTML = `<span class="time-value">${h}</span>:<span class="time-value">${m}</span>:<span class="time-value">${s}</span>`;
+        }
+
+        updateCountdownDisplay(); // Initial display
+        countdownInterval = setInterval(updateCountdownDisplay, 1000); // Update every second
+    }
+
+    function resetPassword() {
+        const cP = document.getElementById('currentPassword')?.value, nP = document.getElementById('newPassword')?.value, cfP = document.getElementById('confirmPassword')?.value;
+        if (!cP || !nP || !cfP) { addDynamicNotification('Input Error', 'Please fill in all fields.', 'warning'); return; }
+        if (nP !== cfP) { addDynamicNotification('Input Error', 'New passwords do not match.', 'warning'); return; }
+        if (nP.length < 6) { addDynamicNotification('Input Error', 'New password too short (min 6 chars).', 'warning'); return; }
+        addDynamicNotification('Password Update', 'Password reset simulated successfully!', 'success'); closeModal('resetPasswordModal');
+        if (document.getElementById('currentPassword')) document.getElementById('currentPassword').value = '';
+        if (document.getElementById('newPassword')) document.getElementById('newPassword').value = '';
+        if (document.getElementById('confirmPassword')) document.getElementById('confirmPassword').value = '';
+    }
+    function copyReferralLink() {
+        const input = document.getElementById('referralLink'), msg = document.getElementById('copyMessage'); if (!input || !msg) return;
+        if (!input.value || input.value.includes('Generating') || input.value.includes('Error')) {
+            msg.textContent = 'Link not available!'; msg.style.color = 'var(--theme-negative)'; msg.style.visibility = 'visible';
+            setTimeout(() => { msg.style.visibility = 'hidden'; }, 2000); return;
+        }
+        navigator.clipboard.writeText(input.value).then(() => {
+            msg.textContent = 'Link copied!'; msg.style.color = 'var(--theme-positive)'; msg.style.visibility = 'visible';
+            setTimeout(() => { msg.style.visibility = 'hidden'; }, 2000);
+        }).catch(err => { console.error('Failed to copy:', err); msg.textContent = 'Copy failed!'; msg.style.color = 'var(--theme-negative)'; msg.style.visibility = 'visible'; setTimeout(() => { msg.style.visibility = 'hidden'; }, 2000); });
+    }
+    function updateReferralSectionDisplay(stats = null) {
+        const cS = stats || getReferralStats(), cE = document.getElementById('referralCountDisplay'), eE = document.getElementById('referralEarningsDisplay'), tEM = document.getElementById('totalReferralEarnings');
+        if (cE) cE.textContent = cS.count; if (eE) eE.textContent = `${cS.totalEarnings.toFixed(2)} MXV`; if (tEM) tEM.textContent = `${cS.totalEarnings.toFixed(2)} MXV`;
+    }
+    function fetchReferralData() {
+        const lI = document.getElementById('referralLink'), lC = document.getElementById('referralListContainer'), tE = document.getElementById('totalReferralEarnings');
+        if (lI) lI.value = 'Generating...'; if (lC) lC.innerHTML = '<div class="loading-spinner"></div>'; if (tE) tE.textContent = '... MXV';
+        updateReferralSectionDisplay();
+        setTimeout(() => {
+            let existingReferrals = getLocalStorageItem('minixverse_sim_referrals', []);
+            const refCount = existingReferrals.length, totalEarn = existingReferrals.reduce((s, r) => s + (r.earnings || 0), 0);
+            if (lI) lI.value = generateReferralLink(); saveReferralStats({ count: refCount, totalEarnings: totalEarn });
+            if (tE) tE.textContent = `${totalEarn.toFixed(2)} MXV`;
+            if (lC) {
+                if (existingReferrals.length > 0) {
+                    lC.innerHTML = '';
+                    existingReferrals.forEach((ref, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.innerHTML = `
+                            <div>Referral #${idx + 1}</div>
+                            <div>${ref.username || `User ${ref.id.substring(0,4)}`}</div>
+                            <div>+${(ref.earnings || 0).toFixed(2)} MXV</div>
+                            <div>${formatTimestamp(ref.joinDate || Date.now())}</div>
+                        `;
+                        lC.appendChild(item);
+                    });
+                } else { lC.innerHTML = '<div class="history-placeholder">No referrals yet.</div>'; }
+            }
+            updateReferralSectionDisplay({ count: refCount, totalEarnings: totalEarn });
+        }, 1200);
+    }
+
+    function fetchAndDisplayHistory() {
+        const hC = document.getElementById('historyListContainer');
+        if (!hC) { console.error("History container not found!"); return; }
+        hC.innerHTML = '<div class="loading-spinner"></div>';
+
+        setTimeout(() => {
+            const transactions = getTransactionHistory();
+            hC.innerHTML = '';
+
+            if (transactions.length === 0) {
+                hC.innerHTML = '<div class="history-placeholder">No transaction history.</div>';
+                return;
+            }
+            transactions.sort((a, b) => b.timestamp - a.timestamp);
+            transactions.forEach(tx => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                let typeDisplay = tx.type.charAt(0).toUpperCase() + tx.type.slice(1);
+                let amountDetails = '';
+                let amountClass = '';
+                let statusDisplay = tx.status.charAt(0).toUpperCase() + tx.status.slice(1);
+                let statusClass = `status-${tx.status}`;
+
+                if (tx.type === 'deposit') {
+                    typeDisplay = `Deposit`;
+                    if (tx.wallet) typeDisplay += ` (${tx.wallet})`; // Show wallet type if available
+                    amountDetails = `+${tx.amount.toFixed(4)} MXV`;
+                    if (tx.originalAmount && tx.originalCurrency) {
+                        amountDetails += ` <br><small>(From ${tx.originalAmount.toFixed(2)} ${tx.originalCurrency})</small>`;
+                    }
+                    amountClass = 'history-amount-positive';
+                } else if (tx.type === 'withdraw') {
+                    typeDisplay = `Withdrawal`;
+                    const netWithdrawal = tx.amount - (tx.fee || 0);
+                    amountDetails = `-${tx.amount.toFixed(4)} MXV`;
+                    amountDetails += ` <br><small>(Net: ${netWithdrawal.toFixed(4)}, Fee: ${(tx.fee || 0).toFixed(4)})</small>`;
+                    amountClass = 'history-amount-negative';
+                } else if (tx.type === 'reward') {
+                    typeDisplay = `Reward`;
+                    amountDetails = `+${tx.amount.toFixed(4)} ${tx.currency || 'MXV'}`;
+                    amountClass = 'history-amount-positive';
+                } else {
+                    amountDetails = `${tx.amount.toFixed(4)} ${tx.currency || 'MXV'}`;
+                }
+
+                if (tx.status === 'failed' && tx.reason) {
+                    statusDisplay += ` <br><small>(${tx.reason})</small>`;
+                }
+                if (tx.status === 'pending' && tx.type === 'withdraw') {
+                     statusDisplay += tx.walletAddress ? ` <br><small>To: ${tx.walletAddress.substring(0,6)}...${tx.walletAddress.substring(tx.walletAddress.length-4)}</small>` : '';
+                }
+                item.innerHTML = `
+                    <div class="history-type">${typeDisplay}</div>
+                    <div class="history-amount ${amountClass}">${amountDetails}</div>
+                    <div class="history-status ${statusClass}">${statusDisplay}</div>
+                    <div class="history-date">${formatTimestamp(tx.timestamp)}</div>
+                `;
+                hC.appendChild(item);
+            });
+        }, 700);
+    }
+
+    function handleLogout() {
+        if (confirm("Are you sure you want to log out?")) {
+            localStorage.removeItem('isLoggedIn'); localStorage.removeItem('userName'); localStorage.removeItem('userEmail');
+            window.location.href = 'index.html';
+        }
+    }
+    function updateBalanceDisplay(balances = null) {
+        const bals = balances || getBalances(), opts = { minimumFractionDigits: 4, maximumFractionDigits: 4 };
+        const mxvEl = document.getElementById('mxvBalanceValue'), trfEl = document.getElementById('transferrableBalanceValue'), rwdEl = document.getElementById('dailyRewardsValue'), curEl = document.getElementById('currentBalanceDisplay');
+        if (mxvEl) mxvEl.textContent = `${bals.mxv.toLocaleString(undefined, opts)} MXV`;
+        if (trfEl) trfEl.textContent = `${bals.transferrable.toLocaleString(undefined, opts)} MXV`;
+        if (rwdEl) rwdEl.textContent = `${bals.rewards.toLocaleString(undefined, opts)} MXV`;
+        if (curEl) { curEl.textContent = bals.mxv.toLocaleString(undefined, opts); curEl.className = 'balance-value default-color'; }
+        updateInputUI();
+    }
+
+    function updateInputUI() {
+        const typeEl = document.getElementById('transactionType');
+        const inputEl = document.getElementById('unifiedInput');
+        const feedbackEl = document.getElementById('unifiedFeedback');
+        const amountLabelEl = document.getElementById('amountLabel');
+        const currentBalanceDisplayEl = document.getElementById('currentBalanceDisplay');
+        const summaryDepositRowEl = document.getElementById('summaryDepositRow');
+        const mainDepositAmountDisplayEl = document.getElementById('depositAmountDisplay');
+        const summaryWithdrawGrossRowEl = document.getElementById('summaryWithdrawGrossRow');
+        const mainWithdrawAmountDisplayEl = document.getElementById('withdrawAmountDisplay');
+        const summaryWithdrawFeeRowEl = document.getElementById('summaryWithdrawFeeRow');
+        const withdrawFeeDisplayEl = document.getElementById('withdrawFeeDisplay');
+        const summaryWithdrawNetRowEl = document.getElementById('summaryWithdrawNetRow');
+        const withdrawNetDisplayEl = document.getElementById('withdrawNetDisplay');
+        const projectedBalanceEl = document.getElementById('projectedBalance');
+
+        if (!typeEl || !inputEl || !feedbackEl || !amountLabelEl || !currentBalanceDisplayEl ||
+            !summaryDepositRowEl || !mainDepositAmountDisplayEl ||
+            !summaryWithdrawGrossRowEl || !mainWithdrawAmountDisplayEl ||
+            !summaryWithdrawFeeRowEl || !withdrawFeeDisplayEl ||
+            !summaryWithdrawNetRowEl || !withdrawNetDisplayEl || !projectedBalanceEl) {
+            console.error("One or more UI elements for transaction input/summary are missing.");
+            return;
+        }
+
+        const type = typeEl.value;
+        const val = parseFloat(inputEl.value) || 0;
+        const bals = getBalances();
+        let feedbackText = '';
+        let projectedChangeDisplay = '0.0000';
+        let projectedChangeColor = 'default-color';
+
+        currentBalanceDisplayEl.textContent = bals.mxv.toFixed(4);
+
+        if (type === 'deposit') {
+            inputEl.placeholder = "Enter MXV amount to receive";
+            amountLabelEl.textContent = "MXV Amount to Receive:";
+            summaryDepositRowEl.style.display = 'flex';
+            summaryWithdrawGrossRowEl.style.display = 'none';
+            summaryWithdrawFeeRowEl.style.display = 'none';
+            summaryWithdrawNetRowEl.style.display = 'none';
+            mainDepositAmountDisplayEl.textContent = val.toFixed(4);
+            mainDepositAmountDisplayEl.className = 'balance-value deposit-value';
+
+            if (val > 0) {
+                const usdtToTransfer = val * MXV_USDT_RATE;
+                feedbackText = `You will need to transfer ${usdtToTransfer.toFixed(2)} USDT.`;
+                projectedChangeDisplay = `+${val.toFixed(4)}`;
+                projectedChangeColor = 'deposit-value';
+                feedbackEl.className = 'amount-feedback deposit';
+            } else {
+                feedbackEl.className = 'amount-feedback';
+            }
+        } else { // type === 'withdraw'
+            inputEl.placeholder = "Enter MXV amount to withdraw";
+            amountLabelEl.textContent = "MXV Amount to Withdraw (Gross):";
+            summaryDepositRowEl.style.display = 'none';
+            summaryWithdrawGrossRowEl.style.display = 'flex';
+            summaryWithdrawFeeRowEl.style.display = 'flex';
+            summaryWithdrawNetRowEl.style.display = 'flex';
+            mainWithdrawAmountDisplayEl.textContent = val.toFixed(4);
+            mainWithdrawAmountDisplayEl.className = 'balance-value withdraw-value';
+
+            if (val > 0) {
+                const fee = val * NETWORK_FEE_RATE;
+                const net = val - fee;
+                withdrawFeeDisplayEl.textContent = fee.toFixed(4);
+                withdrawNetDisplayEl.textContent = net.toFixed(4);
+                feedbackText = `Net: ${net.toFixed(4)} MXV (Fee: ${fee.toFixed(4)}). Details in next step.`;
+                projectedChangeDisplay = `-${val.toFixed(4)}`;
+                projectedChangeColor = 'withdraw-value';
+                if (val > bals.transferrable) {
+                    feedbackText += ' (Insufficient Transferrable Balance)';
+                }
+                feedbackEl.className = 'amount-feedback withdraw';
+            } else {
+                withdrawFeeDisplayEl.textContent = '0.0000';
+                withdrawNetDisplayEl.textContent = '0.0000';
+                feedbackEl.className = 'amount-feedback';
+            }
+        }
+        feedbackEl.textContent = feedbackText;
+        projectedBalanceEl.textContent = projectedChangeDisplay;
+        projectedBalanceEl.className = `balance-value ${projectedChangeColor}`;
+        clearTimeout(inputEl.feedbackTimer);
+        if (val > 0 && feedbackText !== '') {
+            feedbackEl.classList.add('show');
+            inputEl.feedbackTimer = setTimeout(() => { feedbackEl.classList.remove('show'); }, 6000);
+        } else {
+            feedbackEl.classList.remove('show');
+        }
+    }
+
+    function handleInitiateTransaction() {
+        const typeEl = document.getElementById('transactionType');
+        if (!typeEl) return;
+        const type = typeEl.value;
+        const inputEl = document.getElementById('unifiedInput');
+        const val = parseFloat(inputEl.value);
+
+        if (type === 'deposit') {
+            if (isNaN(val) || val <= 0) { addDynamicNotification('Input Error', 'Enter valid MXV amount to deposit.', 'warning'); return; }
+            const mxvAmountEntered = val;
+            const usdtToBeTransferred = mxvAmountEntered * MXV_USDT_RATE;
+            const modal = document.getElementById('orderSummaryModal');
+
+            modal.dataset.txType = type; // Set data-tx-type on the modal itself
+            document.getElementById('modalSummaryTitle').textContent = 'DEPOSIT SUMMARY';
+
+            document.getElementById('modalAmountLabel').textContent = 'MXV Amount Entered';
+            document.getElementById('txAmountEntered').textContent = `${mxvAmountEntered.toFixed(4)} MXV`;
+            document.getElementById('depositConversionRate').textContent = `1 MXV = ${MXV_USDT_RATE.toFixed(2)} USDT`;
+            document.getElementById('modalFeeLabel').textContent = 'Network Fee';
+            document.getElementById('txFeeAmount').textContent = `0.00 USDT`; // No platform fee for deposit
+            document.getElementById('modalFeeInfo').textContent = `To receive ${mxvAmountEntered.toFixed(4)} MXV, you need to transfer the USDT amount shown below. You will be responsible for any network gas fees from your wallet.`;
+            document.getElementById('modalTotalLabel').textContent = 'Total USDT To Be Transferred by You';
+            document.getElementById('txTotalEffective').textContent = `${usdtToBeTransferred.toFixed(2)} USDT`;
+
+            const txId = generateTransactionId();
+            modal.dataset.txId = txId;
+            modal.dataset.txAmountEntered = mxvAmountEntered; // MXV amount
+            modal.dataset.txTotalEffective = usdtToBeTransferred; // USDT amount
+            document.getElementById('transactionId').textContent = txId;
+
+            document.getElementById('depositQrCode').src = `https://placehold.co/200x200/FFFFFF/000000?text=QR+for+${usdtToBeTransferred.toFixed(2)}+USDT%0Ato+${DEPOSIT_WALLET_ADDRESS.substring(0,6)}...`;
+            document.getElementById('depositWalletAddress').textContent = DEPOSIT_WALLET_ADDRESS;
+            openModal('orderSummaryModal');
+        } else if (type === 'withdraw') {
+            if (isNaN(val) || val <= 0) { addDynamicNotification('Input Error', 'Enter valid MXV amount to withdraw.', 'warning'); return; }
+            openModal('withdrawalRequestModal');
+            document.getElementById('withdrawalAmountMXV').value = val.toFixed(4);
+            document.getElementById('unifiedInput').value = '';
+            updateInputUI();
+        }
+    }
+
+    function handleSummaryConfirmation() { // For DEPOSITS, when "CONFIRM & PROCEED" is clicked
+        const modal = document.getElementById('orderSummaryModal');
+        if (!modal) {
+            addDynamicNotification('Error', 'Deposit summary modal not found.', 'error');
+            return;
+        }
+        if (modal.dataset.txType !== 'deposit') {
+            addDynamicNotification('Error', 'Invalid transaction type for confirmation. Expected "deposit".', 'error');
+            return;
+        }
+        document.getElementById('goToWalletBtn').style.display = 'none';
+        document.getElementById('qrWalletDisplay').style.display = 'block';
+        document.getElementById('walletSelection').style.display = 'block';
+        addDynamicNotification('Deposit Instructions', 'Scan QR or use the address. Then select your wallet to initiate the transfer.', 'info');
+    }
+
+    function copyWalletAddress(address) {
+        if (!navigator.clipboard) { addDynamicNotification('Copy Failed', 'Clipboard API not available.', 'error'); return; }
+        navigator.clipboard.writeText(address).then(() => {
+            addDynamicNotification('Address Copied!', `${address} copied to clipboard.`, 'success');
+        }).catch(err => {
+            console.error('Failed to copy address: ', err);
+            addDynamicNotification('Copy Failed', 'Could not copy address.', 'error');
+        });
+    }
+
+    function handleWalletSelection(walletType) {
+        const modal = document.getElementById('orderSummaryModal');
+        if (!modal || modal.dataset.txType !== 'deposit') return;
+
+        const txId = modal.dataset.txId;
+        const mxvToCredit = parseFloat(modal.dataset.txAmountEntered);
+        const usdtToTransfer = parseFloat(modal.dataset.txTotalEffective);
+        const recipientAddress = DEPOSIT_WALLET_ADDRESS; // Platform's receiving address
+
+        if (isNaN(mxvToCredit) || mxvToCredit <= 0 || isNaN(usdtToTransfer) || usdtToTransfer <= 0 || !txId || !recipientAddress) {
+            addDynamicNotification('Transaction Error', 'Deposit data missing, invalid, or recipient address not set.', 'error');
+            closeModal('orderSummaryModal');
+            return;
+        }
+
+        // Constants for ERC20 USDT on Ethereum Mainnet
+        const usdtContractAddressERC20 = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // USDT ERC20 contract
+        const ethereumChainId = 1; // Ethereum Mainnet Chain ID
+        const trustWalletEthereumCoinId = 60; // Trust Wallet's internal ID for Ethereum
+        const usdtDecimals = 6; // USDT has 6 decimal places
+        const amountInSmallestUnit = BigInt(Math.round(usdtToTransfer * (10**usdtDecimals))); // Amount in Wei/smallest unit for ERC20
+        let walletUrl = '';
+
+        if (walletType === 'MetaMask') {
+            // Construct the EIP-681 compliant URL for an ERC20 token transfer.
+            // This format should trigger MetaMask (app or extension) to initiate a 'transfer' call
+            // to the 'usdtContractAddressERC20' contract with the specified recipient and amount.
+            walletUrl = `ethereum:${usdtContractAddressERC20}@${ethereumChainId}/transfer?address=${recipientAddress}&uint256=${amountInSmallestUnit.toString()}`;
+            addDynamicNotification('Redirecting to MetaMask...', `Attempting to open MetaMask to transfer ${usdtToTransfer.toFixed(2)} USDT. Please confirm the transaction in your wallet.`, 'info');
+        } else if (walletType === 'Trust Wallet') {
+            // Construct the Trust Wallet universal link for sending an ERC20 token.
+            // This link is designed to open the Trust Wallet app if installed.
+            walletUrl = `https://link.trustwallet.com/send?asset=c${trustWalletEthereumCoinId}_t${usdtContractAddressERC20}&address=${recipientAddress}&amount=${usdtToTransfer.toFixed(usdtDecimals)}`;
+            addDynamicNotification('Redirecting to Trust Wallet...', `Attempting to open Trust Wallet to transfer ${usdtToTransfer.toFixed(2)} USDT. Please confirm the transaction in your wallet.`, 'info');
+        } else {
+            addDynamicNotification('Wallet Error', 'Unknown wallet type selected. Cannot proceed.', 'error');
+            return;
+        }
+
+        if (walletUrl) {
+            // Attempt to open the generated URL. This should prompt the browser/OS
+            // to open the corresponding wallet app or extension.
+            const walletWindow = window.open(walletUrl, '_blank');
+            if (!walletWindow || walletWindow.closed || typeof walletWindow.closed == 'undefined') {
+                 // Notify user if the new window/tab couldn't be opened, possibly due to a popup blocker.
+                 addDynamicNotification('Popup Issue?', 'If your wallet app/extension did not open, please check your browser\'s popup blocker settings and try again. You might need to allow popups for this site.', 'warning');
+            }
+        }
+        
+        // Provide feedback that the process has started and is now awaiting (simulated) confirmation.
+        addDynamicNotification('Awaiting Confirmation (Simulated)', `Your transaction with ${walletType} has been initiated. We will update your balance once confirmed on the network (this is a simulation).`, 'info');
+
+        // Simulate transaction confirmation after a delay
+        setTimeout(() => {
+            let bals = getBalances();
+            const now = Date.now();
+            const currentHistory = getTransactionHistory();
+            
+            // Prevent double processing if this transaction ID has already been marked as successful.
+            // This can happen if the user clicks multiple times or if the logic is somehow re-triggered.
+            if (currentHistory.some(tx => tx.id === txId && tx.status === 'success')) {
+                console.warn(`Transaction ${txId} (for ${walletType}) already processed as successful. Skipping balance update and history addition.`);
+                if (document.getElementById('orderSummaryModal').classList.contains('active')) {
+                    closeModal('orderSummaryModal'); // Ensure modal is closed if it was still open
+                }
+                return; // Exit to prevent re-processing
+            }
+
+            // Update balances (simulated successful deposit)
+            bals.mxv += mxvToCredit;
+            bals.transferrable += mxvToCredit; // For demo, directly add to transferrable balance
+            saveBalances(bals);
+
+            // Add to transaction history
+            addTransactionToHistory({
+                id: txId, type: 'deposit', amount: mxvToCredit, currency: 'MXV',
+                originalAmount: usdtToTransfer, originalCurrency: 'USDT',
+                status: 'success', timestamp: now, wallet: walletType // Record which wallet was selected
+            });
+
+            addDynamicNotification('Deposit Successful (Simulated)', `${mxvToCredit.toFixed(4)} MXV has been credited to your account from your ${walletType} transaction.`, 'success');
+            closeModal('orderSummaryModal'); // Close the deposit summary modal
+            updateBalanceDisplay(bals); // Refresh balance displays on the main page
+            document.getElementById('unifiedInput').value = ''; // Clear the main transaction input field
+            updateInputUI(); // Refresh the main transaction UI elements
+            fetchAndDisplayHistory(); // Refresh the transaction history display
+        }, 4000); // Simulate a 4-second delay for network confirmation
+    }
+
+
+    function handleWithdrawalRequestConfirmation() {
+        const amountEl = document.getElementById('withdrawalAmountMXV');
+        const addressEl = document.getElementById('withdrawalWalletAddress');
+        const emailEl = document.getElementById('withdrawalEmail');
+        if (!amountEl || !addressEl || !emailEl) { addDynamicNotification('Error', 'Withdrawal form elements missing.', 'error'); return; }
+
+        const grossWithdrawalAmount = parseFloat(amountEl.value);
+        const walletAddress = addressEl.value.trim();
+        const email = emailEl.value.trim();
+
+        if (isNaN(grossWithdrawalAmount) || grossWithdrawalAmount <= 0) { addDynamicNotification('Input Error', 'Valid withdrawal amount needed.', 'warning'); amountEl.focus(); return; }
+        if (!walletAddress) { addDynamicNotification('Input Error', 'Wallet address needed.', 'warning'); addressEl.focus(); return; }
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailPattern.test(email)) { addDynamicNotification('Input Error', 'Valid email needed.', 'warning'); emailEl.focus(); return; }
+
+        let bals = getBalances();
+        if (grossWithdrawalAmount > bals.transferrable) { addDynamicNotification('Insufficient Balance', `Cannot withdraw ${grossWithdrawalAmount.toFixed(4)} MXV. Transferrable: ${bals.transferrable.toFixed(4)} MXV.`, 'error'); return; }
+
+        const txId = generateTransactionId();
+        const now = Date.now();
+        const fee = grossWithdrawalAmount * NETWORK_FEE_RATE;
+        const netAmount = grossWithdrawalAmount - fee;
+
+        bals.mxv -= grossWithdrawalAmount;
+        bals.transferrable -= grossWithdrawalAmount;
+        bals.mxv = Math.max(0, bals.mxv);
+        bals.transferrable = Math.max(0, bals.transferrable);
+        saveBalances(bals);
+
+        const pendingWithdrawals = getPendingWithdrawals();
+        pendingWithdrawals.push({
+            id: txId, amount: grossWithdrawalAmount, netAmount: netAmount, fee: fee,
+            walletAddress: walletAddress, email: email, timestamp: now, status: 'pending'
+        });
+        savePendingWithdrawals(pendingWithdrawals);
+        addTransactionToHistory({
+            id: txId, type: 'withdraw', amount: grossWithdrawalAmount, fee: fee, currency: 'MXV',
+            status: 'pending', walletAddress: walletAddress, email: email, timestamp: now
+        });
+        addDynamicNotification('Withdrawal Initiated', `Request for ${grossWithdrawalAmount.toFixed(4)} MXV is initiated (simulated).`, 'success');
+        closeModal('withdrawalRequestModal');
+        updateBalanceDisplay(bals);
+        updateInputUI();
+        fetchAndDisplayHistory();
+    }
+
+    function checkMaturedDeposits() {
+        const now = Date.now();
+        const maturationThresholdTime = MATURATION_HOURS * 3600000;
+        let balancesUpdated = false;
+        let totalMaturedAmount = 0;
+        let totalRewardsFromOldSystem = 0;
+
+        const pendingDeposits = getPendingDeposits();
+        const remainingPendingDeposits = [];
+        let currentBalances = getBalances();
+
+        pendingDeposits.forEach(deposit => {
+            if (now >= (deposit.timestamp + maturationThresholdTime)) {
+                currentBalances.transferrable += deposit.amount;
+                totalMaturedAmount += deposit.amount;
+                const rewardForThisDeposit = deposit.amount * DAILY_REWARD_RATE;
+                currentBalances.rewards += rewardForThisDeposit;
+                currentBalances.mxv += rewardForThisDeposit;
+                totalRewardsFromOldSystem += rewardForThisDeposit;
+                balancesUpdated = true;
+                addTransactionToHistory({
+                    id: `REW_OLD_${deposit.id.substring(0,8)}_${Date.now()}`,
+                    type: 'reward',
+                    amount: rewardForThisDeposit,
+                    currency: 'MXV',
+                    status: 'success',
+                    timestamp: now,
+                    note: `Reward from matured old deposit (ID: ${deposit.id.substring(0,8)})`
+                });
+                updateHistoryStatus(deposit.id, 'success');
+            } else {
+                remainingPendingDeposits.push(deposit);
+            }
+        });
+
+        if (balancesUpdated) {
+            savePendingDeposits(remainingPendingDeposits);
+            saveBalances(currentBalances);
+
+            let notificationMessage = "";
+            if (totalMaturedAmount > 0) {
+                notificationMessage += `${totalMaturedAmount.toFixed(4)} MXV from older system deposits is now Transferrable. `;
+            }
+            if (totalRewardsFromOldSystem > 0) {
+                notificationMessage += `You also earned +${totalRewardsFromOldSystem.toFixed(4)} MXV in rewards from them.`;
+            }
+            if (notificationMessage) {
+                 addDynamicNotification('Account Update (Old System)', notificationMessage.trim(), 'success');
+            }
+            updateBalanceDisplay(currentBalances);
+            fetchAndDisplayHistory();
+        }
+    }
+
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!checkAuth()) { /* Potentially redirect or show login state */ }
+        setInitialMobileState(); createStars(); updateBalanceDisplay(); updateInputUI(); fetchReferralData(); fetchAndDisplayHistory();
+        startCountdown();
+        setInterval(checkMaturedDeposits, CHECK_INTERVAL_MS);
+
+        document.getElementById('transactionType')?.addEventListener('change', updateInputUI);
+        document.getElementById('unifiedInput')?.addEventListener('input', updateInputUI);
+        document.getElementById('transferToWalletBtn')?.addEventListener('click', handleInitiateTransaction);
+        document.getElementById('goToWalletBtn')?.addEventListener('click', handleSummaryConfirmation);
+        document.getElementById('copyAddressBtn')?.addEventListener('click', () => copyWalletAddress(DEPOSIT_WALLET_ADDRESS));
+        document.getElementById('metamaskOption')?.addEventListener('click', () => handleWalletSelection('MetaMask'));
+        document.getElementById('trustWalletOption')?.addEventListener('click', () => handleWalletSelection('Trust Wallet'));
+        document.getElementById('confirmWithdrawalBtn')?.addEventListener('click', handleWithdrawalRequestConfirmation);
+
+        document.getElementById('cancelResetBtn')?.addEventListener('click', () => closeModal('resetPasswordModal'));
+        document.getElementById('resetPasswordBtn')?.addEventListener('click', resetPassword);
+        document.getElementById('copyReferralBtn')?.addEventListener('click', copyReferralLink);
+        const notifCloseBtn = document.querySelector('.close-notifications');
+        if (notifCloseBtn) { notifCloseBtn.addEventListener('click', toggleNotifications); notifCloseBtn.onclick = null; }
+        document.querySelector('.mark-all-read-btn')?.addEventListener('click', markAllNotificationsAsRead);
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    if (overlay.id === 'notificationOverlay') toggleNotifications(); else closeModal(overlay.id);
+                }
+            });
+        });
+        document.querySelectorAll('.modal-overlay .close-modal').forEach(button => {
+             const modal = button.closest('.modal-overlay');
+             if (modal && !button.onclick) {
+                button.addEventListener('click', () => closeModal(modal.id));
+             }
+         });
+        window.addEventListener('resize', () => { setInitialMobileState(); createStars(); }); updateNotificationBadge();
+    });
+</script>
+
+<script> // Initial UI reset/defaults script
+document.addEventListener("DOMContentLoaded", function() {
+    const refCountDisp = document.getElementById('referralCountDisplay'); if (refCountDisp && !refCountDisp.textContent) refCountDisp.textContent = '0';
+    const refEarnDisp = document.getElementById('referralEarningsDisplay'); if (refEarnDisp && !refEarnDisp.textContent) refEarnDisp.textContent = '0.00 MXV';
+
+    const refListCont = document.getElementById('referralListContainer');
+    if (refListCont && refListCont.children.length === 0) refListCont.innerHTML = '<div class="history-placeholder">No referrals yet.</div>';
+
+    const alertsL = document.getElementById('alertsList');
+    if (alertsL && alertsL.children.length === 0) alertsL.innerHTML = '<div style="text-align: center; color: #a0aec0; padding: 20px;">No notifications yet.</div>';
+
+    const historyL = document.getElementById('historyListContainer');
+    if (historyL && historyL.children.length === 0 && !historyL.querySelector('.loading-spinner')) historyL.innerHTML = '<div class="history-placeholder">No transaction history.</div>';
+
+    const notifBadge = document.getElementById('notificationBadge'); if (notifBadge && !notifBadge.textContent) notifBadge.textContent = '0';
+
+    const welcomeH1 = document.querySelector('.welcome-section h1');
+    if (welcomeH1) {
+        const userName = localStorage.getItem('userName') || 'Guest';
+        welcomeH1.textContent = `Welcome, ${userName}`;
+    }
+    const transactionTypeEl = document.getElementById('transactionType');
+    const unifiedInputEl = document.getElementById('unifiedInput');
+    if (transactionTypeEl && unifiedInputEl) {
+        if (transactionTypeEl.value === 'deposit') {
+            unifiedInputEl.placeholder = "Enter MXV amount to receive";
+        } else {
+            unifiedInputEl.placeholder = "Enter MXV amount to withdraw";
+        }
+    }
+    updateInputUI();
+});
+</script>
+
+</body>
+</html>
